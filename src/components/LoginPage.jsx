@@ -13,7 +13,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   // Update this to your actual backend URL
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://vn-music-academy.onrender.com';
 
   const handleSendOTP = async () => {
     if (!studentEmail || !studentEmail.includes('@')) {
