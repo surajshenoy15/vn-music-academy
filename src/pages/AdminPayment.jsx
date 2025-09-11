@@ -345,10 +345,13 @@ const handlePayment = async () => {
                       <td className="px-6 py-4">
                         {latestPayment ? (
                           <div>
-                            <div className="text-sm font-medium text-[#4A4947]">₹{latestPayment.amount.toLocaleString()}</div>
-                            <div className={`text-xs ${latestPayment.status === 'paid' ? 'text-green-600' : 'text-yellow-600'}`}>
-                              {latestPayment.status}
-                            </div>
+                            <div className="text-sm font-medium text-[#4A4947]">
+  ₹{(latestPayment.total_fee || 0).toLocaleString()}
+</div>
+
+                           <div className={`text-xs ${latestPayment.status === 'Paid' ? 'text-green-600' : 'text-yellow-600'}`}>
+  {latestPayment.status}
+</div>
                           </div>
                         ) : (
                           <span className="text-sm text-gray-400">No record</span>
@@ -420,19 +423,23 @@ const handlePayment = async () => {
                           <CreditCard className="text-green-600" size={20} />
                         </div>
                         <div>
-                          <div className="font-semibold text-[#4A4947]">₹{record.amount.toLocaleString()}</div>
+                          <div className="font-semibold text-[#4A4947]">
+  ₹{(record.total_fee || 0).toLocaleString()}
+</div>
+
                           <div className="text-sm text-gray-500">
                             {new Date(record.created_at).toLocaleDateString()}
                           </div>
                         </div>
                       </div>
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        record.status === 'paid' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {record.status}
-                      </span>
+  record.status === 'Paid' 
+    ? 'bg-green-100 text-green-800' 
+    : 'bg-yellow-100 text-yellow-800'
+}`}>
+  {record.status}
+</span>
+
                     </div>
                   ))}
                 </div>
