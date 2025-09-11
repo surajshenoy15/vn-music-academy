@@ -78,57 +78,62 @@ function AdminPayment() {
     return totalFee - totalPaid;
   };
 
-  const handlePayment = async (student, amount) => {
+const handlePayment = async () => {
   try {
-    // Call backend to create order
+    // 1. Create an order on your backend
     const res = await fetch("https://vn-music-academy.onrender.com/api/payment/create-order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount }),
+      body: JSON.stringify({ amount: 1 }), // ₹1 for testing
     });
 
     const data = await res.json();
     if (!data.success) {
-      throw new Error(data.error || "Failed to create Razorpay order");
+      alert("❌ Failed to create order: " + data.error);
+      return;
     }
 
-    const order = data.order; // ✅ extract actual order
+    const order = data.order; // ✅ properly extract
 
+    // 2. Open Razorpay checkout
     const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID, // ✅ Must be rzp_live_xxx in Vercel .env
+      key: process.env.REACT_APP_RAZORPAY_KEY_ID, // use your env variable in frontend
       amount: order.amount,
       currency: order.currency,
-      name: "Student Fee Payment",
-      description: `Fee payment for ${student.name}`,
-      order_id: order.id, // ✅ this is now correct
+      name: "VN Music Academy",
+      description: "Payment for Course",
+      order_id: order.id,
       handler: async function (response) {
-        // Save to Supabase
-        await supabase.from("fee_records").insert([
-          {
-            student_id: student.id,
-            amount,
-            status: "paid",
-            payment_id: response.razorpay_payment_id,
-          },
-        ]);
-        alert("Payment successful!");
-        fetchStudents();
+        // 3. Verify payment signature
+        const verifyRes = await fetch("https://vn-music-academy.onrender.com/api/payment/verify-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(response),
+        });
+
+        const verifyData = await verifyRes.json();
+        if (verifyData.success) {
+          alert("✅ Payment successful!");
+        } else {
+          alert("❌ Payment verification failed");
+        }
       },
       prefill: {
-        name: student.name,
-        email: student.email,
-        contact: student.phone,
+        name: "Student Name",
+        email: "student@example.com",
+        contact: "9876543210",
       },
-      theme: { color: "#4A4947" },
+      theme: { color: "#3399cc" },
     };
 
     const rzp = new window.Razorpay(options);
     rzp.open();
-  } catch (err) {
-    console.error("❌ Payment error:", err);
-    alert("Error starting payment: " + err.message);
+  } catch (error) {
+    console.error("Payment error:", error);
+    alert("Something went wrong. Please try again.");
   }
 };
+
 
 
 
