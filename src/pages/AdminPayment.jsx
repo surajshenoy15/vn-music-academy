@@ -86,17 +86,23 @@ function AdminPayment() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ amount }),
     });
-    const order = await res.json();
+
+    const data = await res.json();
+    if (!data.success) {
+      throw new Error(data.error || "Failed to create Razorpay order");
+    }
+
+    const order = data.order; // ✅ extract actual order
 
     const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID, // ✅ Must be rzp_live_xxx in Vercel .env
       amount: order.amount,
       currency: order.currency,
       name: "Student Fee Payment",
       description: `Fee payment for ${student.name}`,
-      order_id: order.id,
+      order_id: order.id, // ✅ this is now correct
       handler: async function (response) {
-        // Save to Supabase or call backend to verify payment
+        // Save to Supabase
         await supabase.from("fee_records").insert([
           {
             student_id: student.id,
@@ -119,10 +125,11 @@ function AdminPayment() {
     const rzp = new window.Razorpay(options);
     rzp.open();
   } catch (err) {
-    console.error(err);
-    alert("Error starting payment");
+    console.error("❌ Payment error:", err);
+    alert("Error starting payment: " + err.message);
   }
 };
+
 
 
   const updateStudentFee = async (studentId, newFee) => {
