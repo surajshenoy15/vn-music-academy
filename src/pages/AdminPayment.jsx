@@ -103,21 +103,43 @@ const handlePayment = async () => {
       name: "VN Music Academy",
       description: "Payment for Course",
       order_id: order.id,
-      handler: async function (response) {
-        // 3. Verify payment signature
-        const verifyRes = await fetch("https://vn-music-academy.onrender.com/api/payment/verify-payment", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(response),
-        });
+     handler: async function (response) {
+  // 1. Verify payment with backend
+  const verifyRes = await fetch("https://vn-music-academy.onrender.com/api/payment/verify-payment", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(response),
+  });
 
-        const verifyData = await verifyRes.json();
-        if (verifyData.success) {
-          alert("✅ Payment successful!");
-        } else {
-          alert("❌ Payment verification failed");
-        }
-      },
+  const verifyData = await verifyRes.json();
+
+  if (verifyData.success) {
+    alert("✅ Payment successful!");
+
+    // 2. Save record in Supabase
+    const { data, error } = await supabase
+      .from("fee_records")
+      .insert([
+        {
+          student_id: selectedStudent.id,        // who paid
+          total_fee: pendingAmount,              // how much
+          status: "Paid",                        // mark paid
+          razorpay_payment_id: response.razorpay_payment_id,
+        },
+      ]);
+
+    if (error) {
+      console.error("Error saving payment:", error);
+      alert("⚠️ Payment verified but record not saved in DB");
+    } else {
+      alert("💾 Payment stored in database!");
+      fetchStudents(); // refresh table
+    }
+  } else {
+    alert("❌ Payment verification failed");
+  }
+},
+
       prefill: {
         name: "Student Name",
         email: "student@example.com",
