@@ -28,15 +28,28 @@ const Navbar = () => {
     checkLoginStatus();
   }, [checkLoginStatus]);
 
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (["adminToken", "studentToken"].includes(e.key) || e.key === null) {
-        checkLoginStatus();
-      }
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, [checkLoginStatus]);
+ useEffect(() => {
+  const handleStorageChange = (e) => {
+    if (["adminToken", "studentToken"].includes(e.key) || e.key === null) {
+      checkLoginStatus();
+    }
+  };
+
+  const handleLoginEvent = () => {
+    checkLoginStatus();
+  };
+
+  window.addEventListener("storage", handleStorageChange);
+  window.addEventListener("loginSuccess", handleLoginEvent);
+  window.addEventListener("studentLoginSuccess", handleLoginEvent);
+
+  return () => {
+    window.removeEventListener("storage", handleStorageChange);
+    window.removeEventListener("loginSuccess", handleLoginEvent);
+    window.removeEventListener("studentLoginSuccess", handleLoginEvent);
+  };
+}, [checkLoginStatus]);
+
 
   const handleLogout = useCallback(() => {
     localStorage.removeItem("adminToken");

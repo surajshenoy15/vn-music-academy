@@ -140,10 +140,10 @@ const LoginPage = () => {
       }
 
       // Force navbar to update immediately
-      if (window.forceNavbarUpdate) {
-        console.log("🔄 Calling forceNavbarUpdate for student");
-        window.forceNavbarUpdate();
-      }
+      // if (window.forceNavbarUpdate) {
+      //   console.log("🔄 Calling forceNavbarUpdate for student");
+      //   window.forceNavbarUpdate();
+      // }
 
       // Dispatch custom event for navbar
       window.dispatchEvent(new Event('studentLoginSuccess'));
