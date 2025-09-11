@@ -93,11 +93,11 @@ const handlePayment = async () => {
       return;
     }
 
-    const order = data.order; // ✅ properly extract
+    const order = data.order;
 
     // 2. Open Razorpay checkout
     const options = {
-      key: process.env.REACT_APP_RAZORPAY_KEY_ID, // use your env variable in frontend
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID, // ✅ Vite way
       amount: order.amount,
       currency: order.currency,
       name: "VN Music Academy",
@@ -123,7 +123,7 @@ const handlePayment = async () => {
         email: "student@example.com",
         contact: "9876543210",
       },
-      theme: { color: "#3399cc" },
+      theme: { color: "#4A4947" },
     };
 
     const rzp = new window.Razorpay(options);
