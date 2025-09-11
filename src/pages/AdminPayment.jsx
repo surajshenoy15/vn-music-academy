@@ -81,7 +81,7 @@ function AdminPayment() {
   const handlePayment = async (student, amount) => {
   try {
     // Call backend to create order
-    const res = await fetch("https://vn-music-academy.vercel.app/create-order", {
+    const res = await fetch("https://vn-music-academy.onrender.com/api/payment/create-order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ amount }),
