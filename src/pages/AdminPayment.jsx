@@ -79,30 +79,34 @@ function AdminPayment() {
   };
 
   const handlePayment = async (student, amount) => {
+  try {
+    // Call backend to create order
+    const res = await fetch("https://vn-music-academy.vercel.app/create-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount }),
+    });
+    const order = await res.json();
+
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-      amount: amount * 100,
-      currency: "INR",
+      amount: order.amount,
+      currency: order.currency,
       name: "Student Fee Payment",
       description: `Fee payment for ${student.name}`,
+      order_id: order.id,
       handler: async function (response) {
-        try {
-          const { error } = await supabase.from("fee_records").insert([
-            {
-              student_id: student.id,
-              amount,
-              status: "paid",
-              payment_id: response.razorpay_payment_id,
-            },
-          ]);
-          if (error) throw error;
-
-          alert("Payment successful!");
-          fetchStudents();
-        } catch (err) {
-          console.error("Error saving payment:", err);
-          alert("Error saving payment record");
-        }
+        // Save to Supabase or call backend to verify payment
+        await supabase.from("fee_records").insert([
+          {
+            student_id: student.id,
+            amount,
+            status: "paid",
+            payment_id: response.razorpay_payment_id,
+          },
+        ]);
+        alert("Payment successful!");
+        fetchStudents();
       },
       prefill: {
         name: student.name,
@@ -114,7 +118,12 @@ function AdminPayment() {
 
     const rzp = new window.Razorpay(options);
     rzp.open();
-  };
+  } catch (err) {
+    console.error(err);
+    alert("Error starting payment");
+  }
+};
+
 
   const updateStudentFee = async (studentId, newFee) => {
     try {
