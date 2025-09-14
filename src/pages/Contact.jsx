@@ -12,15 +12,6 @@ const Contact = () => {
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,323 +48,359 @@ const Contact = () => {
   ];
 
   return (
-    <>
-      {/* SEO Meta Tags */}
-      <div style={{ display: 'none' }}>
-        <title>Contact VN Music Academy | Best Music Lessons in Banashankari, Bengaluru</title>
-        <meta name="description" content="Contact VN Music Academy for expert music lessons in Banashankari, Bengaluru. Call us, visit our academy, or send a message to start your musical journey today!" />
-        <meta name="keywords" content="VN Music Academy contact, music lessons Banashankari, music school Bengaluru, learn music Bangalore, contact music teacher" />
-        <meta property="og:title" content="Contact VN Music Academy - Premier Music Education in Bengaluru" />
-        <meta property="og:description" content="Get in touch with VN Music Academy for professional music lessons. Located in Banashankari, Bengaluru. Expert instructors, flexible timings." />
-        <meta name="geo.region" content="IN-KA" />
-        <meta name="geo.placename" content="Banashankari, Bengaluru" />
-        <meta name="geo.position" content="12.9249;77.5569" />
-      </div>
-
-      <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 relative overflow-hidden">
-        {/* Animated Background Elements */}
-        <div 
-          className="absolute inset-0 opacity-5"
-          style={{
-            background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, #4A4947 0%, transparent 50%)`
-          }}
-        />
-        
-        {/* Floating Music Notes */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute animate-bounce opacity-10"
-              style={{
-                left: `${10 + i * 15}%`,
-                top: `${20 + (i % 3) * 30}%`,
-                animationDelay: `${i * 0.5}s`,
-                animationDuration: `${3 + i * 0.5}s`
-              }}
-            >
-              <Music size={24 + i * 4} className="text-[#4A4947]" />
-            </div>
-          ))}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+      {/* Hero Section */}
+      <section className="relative h-[600px] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100" />
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+          <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-[#4A4947] to-gray-800 text-white px-8 py-3 rounded-full text-sm font-semibold mb-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <Music size={18} />
+            <span>VN Music Academy</span>
+          </div>
+          <h1 className="text-[#4A4947] text-7xl md:text-8xl font-bold mb-6 tracking-wide drop-shadow-2xl">
+            LET'S MAKE MUSIC TOGETHER
+          </h1>
+          <p className="text-gray-600 text-xl md:text-2xl font-light leading-relaxed">
+            Ready to start your musical journey? We're here to guide you every step of the way
+          </p>
         </div>
+      </section>
 
-        <div className="relative z-10 pt-20 pb-16">
-          {/* Hero Section */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-            <div className="text-center">
-              <div className="inline-flex items-center space-x-2 bg-[#4A4947] text-white px-6 py-2 rounded-full text-sm font-medium mb-6 animate-pulse">
-                <Music size={16} />
-                <span>VN Music Academy</span>
-              </div>
-              <h1 className="text-5xl md:text-7xl font-bold text-[#4A4947] mb-6 leading-tight">
-                Let's Make
-                <span className="block bg-gradient-to-r from-[#4A4947] to-gray-600 bg-clip-text text-transparent animate-pulse">
-                  Music Together
-                </span>
-              </h1>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Ready to start your musical journey? We're here to guide you every step of the way. 
-                Connect with us and discover the joy of music at Bengaluru's premier music academy.
-              </p>
-            </div>
+      {/* Stats Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-bold text-gray-900 mb-6">Our Achievements</h2>
+            <div className="w-32 h-1.5 bg-gradient-to-r from-[#4A4947] to-gray-600 mx-auto mb-8 rounded-full"></div>
+            <p className="text-gray-600 text-xl max-w-3xl mx-auto leading-relaxed">
+              Discover why we're Bengaluru's premier music academy with our track record of success
+            </p>
           </div>
 
-          {/* Stats Section */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-              {stats.map((stat, index) => (
-                <div 
-                  key={index}
-                  className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group"
-                >
+          {/* Stats Cards */}
+          <div className="grid md:grid-cols-4 gap-8 mb-16">
+            {stats.map((stat, index) => (
+              <div
+                key={index}
+                className="group relative overflow-hidden rounded-2xl cursor-pointer transition-all duration-500 transform hover:scale-105 shadow-xl hover:shadow-2xl"
+              >
+                <div className="bg-white/90 backdrop-blur-sm p-8 border border-gray-100 rounded-2xl">
                   <div className="flex flex-col items-center text-center">
-                    <div className="bg-[#4A4947] p-4 rounded-full mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <div className="bg-gradient-to-br from-[#4A4947] to-gray-800 p-5 rounded-2xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
                       <stat.icon size={32} className="text-white" />
                     </div>
-                    <h3 className="text-3xl font-bold text-[#4A4947] mb-2">{stat.number}</h3>
-                    <p className="text-gray-600 font-medium">{stat.label}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Main Content */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid lg:grid-cols-3 gap-12">
-              
-              {/* Contact Information */}
-              <div className="lg:col-span-1">
-                <div className="sticky top-8">
-                  <h2 className="text-3xl font-bold text-[#4A4947] mb-8">Get in Touch</h2>
-                  
-                  <div className="space-y-6">
-                    {/* Address Card */}
-                    <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group">
-                      <div className="flex items-start space-x-4">
-                        <div className="bg-[#4A4947] p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                          <MapPin size={24} className="text-white" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-[#4A4947] text-lg mb-2">Visit Our Academy</h3>
-                          <p className="text-gray-600 leading-relaxed">
-                            2550, 21st Main Rd, Siddanna Layout,<br />
-                            Banashankari Stage II, Banashankari,<br />
-                            Bengaluru, Karnataka 560070, India
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Phone Card */}
-                    <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group">
-                      <div className="flex items-start space-x-4">
-                        <div className="bg-[#4A4947] p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                          <Phone size={24} className="text-white" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-[#4A4947] text-lg mb-2">Call Us</h3>
-                          <p className="text-gray-600">
-                            <a href="tel:+912562257" className="hover:text-[#4A4947] transition-colors">
-                              +91 2562-2557
-                            </a>
-                          </p>
-                          <p className="text-gray-600">
-                            <a href="tel:+912554251" className="hover:text-[#4A4947] transition-colors">
-                              +91 2554-2551
-                            </a>
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Email Card */}
-                    <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group">
-                      <div className="flex items-start space-x-4">
-                        <div className="bg-[#4A4947] p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                          <Mail size={24} className="text-white" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-[#4A4947] text-lg mb-2">Email Us</h3>
-                          <p className="text-gray-600">
-                            <a href="mailto:info@vnmusicacademy.com" className="hover:text-[#4A4947] transition-colors">
-                              info@vnmusicacademy.com
-                            </a>
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Hours Card */}
-                    <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group">
-                      <div className="flex items-start space-x-4">
-                        <div className="bg-[#4A4947] p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                          <Clock size={24} className="text-white" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-[#4A4947] text-lg mb-2">Academy Hours</h3>
-                          <div className="text-gray-600 space-y-1">
-                            <p>Mon - Fri: 9:00 AM - 8:00 PM</p>
-                            <p>Sat - Sun: 10:00 AM - 6:00 PM</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <h3 className="text-3xl font-black text-[#4A4947] mb-3 group-hover:text-gray-800 transition-colors">{stat.number}</h3>
+                    <p className="text-gray-600 font-semibold text-base">{stat.label}</p>
                   </div>
                 </div>
               </div>
-
-              {/* Contact Form */}
-              <div className="lg:col-span-2">
-                <div className="bg-white rounded-3xl shadow-2xl p-8 lg:p-12 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#4A4947] to-gray-600 opacity-5 rounded-full -mr-16 -mt-16" />
-                  
-                  <h2 className="text-4xl font-bold text-[#4A4947] mb-8 relative">
-                    Send Us a Message
-                    <div className="absolute bottom-0 left-0 w-16 h-1 bg-[#4A4947] rounded-full" />
-                  </h2>
-
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="group">
-                        <label className="block text-sm font-semibold text-[#4A4947] mb-2">
-                          Full Name *
-                        </label>
-                        <input
-                          type="text"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleInputChange}
-                          required
-                          className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-[#4A4947] focus:ring-0 transition-all duration-300 group-hover:border-gray-300"
-                          placeholder="Enter your full name"
-                        />
-                      </div>
-                      
-                      <div className="group">
-                        <label className="block text-sm font-semibold text-[#4A4947] mb-2">
-                          Email Address *
-                        </label>
-                        <input
-                          type="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          required
-                          className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-[#4A4947] focus:ring-0 transition-all duration-300 group-hover:border-gray-300"
-                          placeholder="your.email@example.com"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="group">
-                        <label className="block text-sm font-semibold text-[#4A4947] mb-2">
-                          Phone Number
-                        </label>
-                        <input
-                          type="tel"
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-[#4A4947] focus:ring-0 transition-all duration-300 group-hover:border-gray-300"
-                          placeholder="+91 12345 67890"
-                        />
-                      </div>
-                      
-                      <div className="group">
-                        <label className="block text-sm font-semibold text-[#4A4947] mb-2">
-                          Subject *
-                        </label>
-                        <select
-                          name="subject"
-                          value={formData.subject}
-                          onChange={handleInputChange}
-                          required
-                          className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-[#4A4947] focus:ring-0 transition-all duration-300 group-hover:border-gray-300"
-                        >
-                          <option value="">Select a subject</option>
-                          <option value="general">General Inquiry</option>
-                          <option value="admission">Course Admission</option>
-                          <option value="pricing">Pricing Information</option>
-                          <option value="trial">Free Trial Class</option>
-                          <option value="other">Other</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="group">
-                      <label className="block text-sm font-semibold text-[#4A4947] mb-2">
-                        Preferred Contact Method
-                      </label>
-                      <div className="flex space-x-6">
-                        {['email', 'phone', 'whatsapp'].map((method) => (
-                          <label key={method} className="flex items-center cursor-pointer">
-                            <input
-                              type="radio"
-                              name="preferredContact"
-                              value={method}
-                              checked={formData.preferredContact === method}
-                              onChange={handleInputChange}
-                              className="mr-2 text-[#4A4947] focus:ring-[#4A4947]"
-                            />
-                            <span className="text-gray-700 capitalize">{method}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="group">
-                      <label className="block text-sm font-semibold text-[#4A4947] mb-2">
-                        Your Message *
-                      </label>
-                      <textarea
-                        name="message"
-                        value={formData.message}
-                        onChange={handleInputChange}
-                        required
-                        rows={6}
-                        className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-[#4A4947] focus:ring-0 transition-all duration-300 resize-none group-hover:border-gray-300"
-                        placeholder="Tell us about your musical interests, goals, or any questions you have..."
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={isLoading}
-                      className="w-full bg-[#4A4947] hover:bg-gray-800 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-                    >
-                      {isLoading ? (
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
-                      ) : isSubmitted ? (
-                        <>
-                          <CheckCircle size={20} />
-                          <span>Message Sent Successfully!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Send size={20} />
-                          <span>Send Message</span>
-                        </>
-                      )}
-                    </button>
-                  </form>
-
-                  <div className="mt-8 pt-8 border-t border-gray-200">
-                    <p className="text-center text-gray-600">
-                      <span className="font-semibold text-[#4A4947]">Quick Response Guaranteed!</span><br />
-                      We typically respond within 2 hours during business hours.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
-
-          
         </div>
-      </div>
-    </>
+      </section>
+
+      {/* Contact Form and Map */}
+      <section className="py-20 px-4 bg-gradient-to-br from-gray-50 to-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-start">
+            
+            {/* Contact Form */}
+            <div className="bg-white rounded-3xl p-10 shadow-2xl border border-gray-100">
+              <div className="mb-10">
+                <h2 className="text-4xl font-bold text-gray-900 mb-4">Send Us a Message</h2>
+                <div className="w-20 h-1.5 bg-gradient-to-r from-[#4A4947] to-gray-600 mb-6 rounded-full"></div>
+                <p className="text-gray-600 text-lg leading-relaxed">
+                  Our friendly team would love to hear from you! Fill out the form and we'll get back to you within 2 hours.
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-7">
+                {/* Name Field */}
+                <div className="space-y-3">
+                  <label className="text-gray-700 font-semibold text-sm flex items-center gap-2">
+                    <Users className="text-[#4A4947] w-4 h-4" />
+                    Full Name*
+                  </label>
+                  <input
+                    required
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A4947] focus:border-[#4A4947] transition-all duration-300 bg-gray-50 focus:bg-white"
+                    placeholder="Enter your full name"
+                  />
+                </div>
+
+                {/* Email and Phone */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <label className="text-gray-700 font-semibold text-sm flex items-center gap-2">
+                      <Mail className="text-[#4A4947] w-4 h-4" />
+                      Email Address*
+                    </label>
+                    <input
+                      required
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A4947] focus:border-[#4A4947] transition-all duration-300 bg-gray-50 focus:bg-white"
+                      placeholder="your.email@example.com"
+                    />
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <label className="text-gray-700 font-semibold text-sm flex items-center gap-2">
+                      <Phone className="text-[#4A4947] w-4 h-4" />
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A4947] focus:border-[#4A4947] transition-all duration-300 bg-gray-50 focus:bg-white"
+                      placeholder="+91 12345 67890"
+                    />
+                  </div>
+                </div>
+
+                {/* Subject */}
+                <div className="space-y-3">
+                  <label className="text-gray-700 font-semibold text-sm flex items-center gap-2">
+                    <Music className="text-[#4A4947] w-4 h-4" />
+                    Subject*
+                  </label>
+                  <select
+                    required
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleInputChange}
+                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A4947] focus:border-[#4A4947] bg-gray-50 focus:bg-white transition-all duration-300"
+                  >
+                    <option value="">Select a subject</option>
+                    <option value="general">General Inquiry</option>
+                    <option value="admission">Course Admission</option>
+                    <option value="pricing">Pricing Information</option>
+                    <option value="trial">Free Trial Class</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+
+                {/* Preferred Contact Method */}
+                <div className="space-y-3">
+                  <label className="text-gray-700 font-semibold text-sm">
+                    Preferred Contact Method
+                  </label>
+                  <div className="flex gap-6">
+                    {['email', 'phone', 'whatsapp'].map((method) => (
+                      <label key={method} className="flex items-center cursor-pointer group/radio">
+                        <input
+                          type="radio"
+                          name="preferredContact"
+                          value={method}
+                          checked={formData.preferredContact === method}
+                          onChange={handleInputChange}
+                          className="mr-2 text-[#4A4947] focus:ring-[#4A4947]"
+                        />
+                        <span className="text-gray-700 capitalize font-semibold group-hover/radio:text-[#4A4947] transition-colors">
+                          {method}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Message */}
+                <div className="space-y-3">
+                  <label className="text-gray-700 font-semibold text-sm flex items-center gap-2">
+                    <Send className="text-[#4A4947] w-4 h-4" />
+                    Your Message*
+                  </label>
+                  <textarea
+                    required
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    rows="5"
+                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A4947] focus:border-[#4A4947] transition-all duration-300 bg-gray-50 focus:bg-white resize-vertical"
+                    placeholder="Tell us about your musical interests, goals, or any questions you have..."
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-gradient-to-r from-[#4A4947] to-gray-800 text-white font-bold py-4 px-6 rounded-xl hover:from-gray-800 hover:to-[#4A4947] transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3"
+                >
+                  {isLoading ? (
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
+                  ) : isSubmitted ? (
+                    <>
+                      <CheckCircle size={20} />
+                      <span>Message Sent Successfully!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send size={20} />
+                      <span>Send Message</span>
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
+
+            {/* Contact Information and Map */}
+            <div className="space-y-8">
+              {/* Contact Info */}
+              <div className="bg-white rounded-3xl p-8 shadow-2xl border border-gray-100">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-gradient-to-r from-[#4A4947] to-gray-800 p-4 rounded-2xl shadow-lg">
+                      <MapPin className="text-white text-2xl" />
+                    </div>
+                    <div>
+                      <h3 className="text-3xl font-bold text-gray-900">
+                        VN Music Academy
+                      </h3>
+                      <p className="text-gray-500 text-lg">Bengaluru's Premier Music Academy</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="w-20 h-1.5 bg-gradient-to-r from-[#4A4947] to-gray-600 mb-6 rounded-full"></div>
+                
+                <div className="space-y-6">
+                  {/* Address */}
+                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl border border-gray-200">
+                    <div className="flex items-start gap-4">
+                      <div className="bg-[#4A4947] p-3 rounded-full shadow-lg">
+                        <MapPin className="text-white text-lg" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-gray-900 text-lg mb-2">Visit Our Academy</h4>
+                        <p className="text-gray-700 leading-relaxed text-base">
+                          2550, 21st Main Rd, Siddanna Layout,<br />
+                          Banashankari Stage II, Banashankari,<br />
+                          Bengaluru, Karnataka 560070, India
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Phone */}
+                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl border border-gray-200">
+                    <div className="flex items-start gap-4">
+                      <div className="bg-[#4A4947] p-3 rounded-full shadow-lg">
+                        <Phone className="text-white text-lg" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-gray-900 text-lg mb-2">Call Us</h4>
+                        <p className="text-gray-700 text-base">
+                          <a href="tel:+918310986017" className="hover:text-[#4A4947] transition-colors font-semibold">
+                            +91 8310-986017
+                          </a>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Email */}
+                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl border border-gray-200">
+                    <div className="flex items-start gap-4">
+                      <div className="bg-[#4A4947] p-3 rounded-full shadow-lg">
+                        <Mail className="text-white text-lg" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-gray-900 text-lg mb-2">Email Us</h4>
+                        <p className="text-gray-700 text-base">
+                          <a href="mailto:vnmusicacademy.official@gmail.com" className="hover:text-[#4A4947] transition-colors font-semibold break-all">
+                            vnmusicacademy.official@gmail.com
+                          </a>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Hours */}
+                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl border border-gray-200">
+                    <div className="flex items-start gap-4">
+                      <div className="bg-[#4A4947] p-3 rounded-full shadow-lg">
+                        <Clock className="text-white text-lg" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-gray-900 text-lg mb-2">Academy Hours</h4>
+                        <div className="text-gray-700 space-y-1 text-base">
+                          <p><span className="font-semibold">Mon - Fri:</span> 11:00 AM - 8:00 PM</p>
+                          <p><span className="font-semibold">Saturday:</span> 10:00 AM - 1:00 PM</p>
+                          <p><span className="font-semibold text-red-600">Sunday:</span> Closed</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Map Container */}
+              <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex-1">
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 border-b border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className="text-gray-700 font-semibold">Live Location</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                      <div className="w-2 h-2 bg-[#4A4947] rounded-full"></div>
+                      <span>Interactive Map</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="relative group">
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3888.4059!2d77.5508!3d12.9279!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTLCsDU1JzQwLjQiTiA3N8KwMzMnMDIuOSJF!5e0!3m2!1sen!2sin!4v1635750000000!5m2!1sen!2sin"
+                    width="100%"
+                    height="400"
+                    allowFullScreen=""
+                    loading="lazy"
+                    title="VN Music Academy Location"
+                    className="w-full transition-all duration-300 group-hover:brightness-110"
+                    style={{
+                      border: 'none',
+                      borderRadius: '0 0 1.5rem 1.5rem'
+                    }}
+                  ></iframe>
+                  
+                  {/* Map Overlay */}
+                  <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-[#4A4947] rounded-full flex items-center justify-center">
+                          <MapPin className="text-white text-sm" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900 text-sm">VN Music Academy</h4>
+                          <p className="text-gray-600 text-xs">Banashankari, Bengaluru</p>
+                        </div>
+                      </div>
+                      <a 
+                        href="https://www.google.com/maps/dir/?api=1&destination=2550,+21st+Main+Rd,+Siddanna+Layout,+Banashankari+Stage+II,+Banashankari,+Bengaluru,+Karnataka+560070"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-[#4A4947] hover:bg-gray-800 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors duration-300"
+                      >
+                        Get Directions
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 };
 
