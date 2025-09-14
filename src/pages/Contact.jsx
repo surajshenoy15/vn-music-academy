@@ -1,5 +1,138 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle, Music, Users, Award, Star } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle, Music, Users, Award, Star, X, AlertCircle } from 'lucide-react';
+
+// Toast Component
+const Toast = ({ message, type, onClose, isVisible }) => {
+  useEffect(() => {
+    if (isVisible) {
+      const timer = setTimeout(onClose, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible, onClose]);
+
+  if (!isVisible) return null;
+
+  const getToastStyles = () => {
+    switch (type) {
+      case 'success':
+        return 'bg-green-50 border-green-200 text-green-800';
+      case 'error':
+        return 'bg-red-50 border-red-200 text-red-800';
+      case 'warning':
+        return 'bg-yellow-50 border-yellow-200 text-yellow-800';
+      default:
+        return 'bg-blue-50 border-blue-200 text-blue-800';
+    }
+  };
+
+  const getIcon = () => {
+    switch (type) {
+      case 'success':
+        return <CheckCircle className="w-5 h-5 text-green-600" />;
+      case 'error':
+        return <AlertCircle className="w-5 h-5 text-red-600" />;
+      case 'warning':
+        return <AlertCircle className="w-5 h-5 text-yellow-600" />;
+      default:
+        return <CheckCircle className="w-5 h-5 text-blue-600" />;
+    }
+  };
+
+  return (
+    <div className={`fixed top-6 right-6 z-50 max-w-md w-full transform transition-all duration-500 ${
+      isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
+    }`}>
+      <div className={`border-2 rounded-xl p-4 shadow-lg backdrop-blur-sm ${getToastStyles()}`}>
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0">
+            {getIcon()}
+          </div>
+          <div className="flex-1">
+            <p className="font-semibold text-sm">{message}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="flex-shrink-0 p-1 hover:bg-white/20 rounded-lg transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Confirmation Modal Component
+const ConfirmationModal = ({ isOpen, onClose, onConfirm, formData }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div 
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 transform transition-all duration-300">
+        <div className="text-center mb-6">
+          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-[#4A4947] to-gray-800 rounded-full flex items-center justify-center mb-4">
+            <Send className="w-8 h-8 text-white" />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">Confirm Your Message</h3>
+          <p className="text-gray-600">Please review your information before sending</p>
+        </div>
+
+        <div className="bg-gray-50 rounded-2xl p-6 mb-6 space-y-3">
+          <div className="flex justify-between">
+            <span className="font-semibold text-gray-700">Name:</span>
+            <span className="text-gray-900">{formData.name}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-semibold text-gray-700">Email:</span>
+            <span className="text-gray-900">{formData.email}</span>
+          </div>
+          {formData.phone && (
+            <div className="flex justify-between">
+              <span className="font-semibold text-gray-700">Phone:</span>
+              <span className="text-gray-900">{formData.phone}</span>
+            </div>
+          )}
+          <div className="flex justify-between">
+            <span className="font-semibold text-gray-700">Subject:</span>
+            <span className="text-gray-900 capitalize">{formData.subject}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-semibold text-gray-700">Contact Method:</span>
+            <span className="text-gray-900 capitalize">{formData.preferredContact}</span>
+          </div>
+          <div className="pt-2 border-t border-gray-200">
+            <span className="font-semibold text-gray-700 block mb-2">Message:</span>
+            <p className="text-gray-900 text-sm bg-white p-3 rounded-lg border">
+              {formData.message.length > 100 
+                ? `${formData.message.substring(0, 100)}...` 
+                : formData.message
+              }
+            </p>
+          </div>
+        </div>
+
+        <div className="flex gap-4">
+          <button
+            onClick={onClose}
+            className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="flex-1 px-6 py-3 bg-gradient-to-r from-[#4A4947] to-gray-800 text-white rounded-xl font-semibold hover:from-gray-800 hover:to-[#4A4947] transition-all duration-300 shadow-lg hover:shadow-xl"
+          >
+            Send Message
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -10,53 +143,75 @@ const Contact = () => {
     message: '',
     preferredContact: 'email'
   });
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  
   const [isLoading, setIsLoading] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [toast, setToast] = useState({ message: '', type: '', isVisible: false });
 
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-  setIsLoading(true);
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type, isVisible: true });
+  };
 
-  try {
-    // Map frontend preferredContact to backend preferred_contact
-    const payload = {
-      ...formData,
-      preferred_contact: formData.preferredContact,
-    };
+  const hideToast = () => {
+    setToast(prev => ({ ...prev, isVisible: false }));
+  };
 
-    const response = await fetch("https://vn-music-academy.onrender.com/api/contact/submit", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Backend error:", errorData);
-      throw new Error(errorData.error || "Failed to send message");
+  const handleSubmit = (e) => {
+    e?.preventDefault();
+    
+    // Validate required fields
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      showToast('Please fill in all required fields', 'error');
+      return;
     }
 
-    setIsSubmitted(true);
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      subject: "",
-      message: "",
-      preferredContact: "email"
-    });
+    // Show confirmation modal
+    setShowConfirmation(true);
+  };
 
-    setTimeout(() => setIsSubmitted(false), 3000);
+  const handleConfirmSubmit = async () => {
+    setShowConfirmation(false);
+    setIsLoading(true);
 
-  } catch (error) {
-    console.error("Error submitting form:", error);
-    alert("Something went wrong. Please try again later.");
-  } finally {
-    setIsLoading(false);
-  }
-};
+    try {
+      // Map frontend preferredContact to backend preferred_contact
+      const payload = {
+        ...formData,
+        preferred_contact: formData.preferredContact,
+      };
 
+      const response = await fetch("https://vn-music-academy.onrender.com/api/contact/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Backend error:", errorData);
+        throw new Error(errorData.error || "Failed to send message");
+      }
+
+      // Success
+      showToast('Message sent successfully! We\'ll get back to you soon.', 'success');
+      
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        subject: "",
+        message: "",
+        preferredContact: "email"
+      });
+
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      showToast('Something went wrong. Please try again later.', 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     setFormData({
@@ -74,6 +229,22 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+      {/* Toast Notification */}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+      />
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showConfirmation}
+        onClose={() => setShowConfirmation(false)}
+        onConfirm={handleConfirmSubmit}
+        formData={formData}
+      />
+
       {/* Hero Section */}
       <section className="relative h-[600px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100" />
@@ -139,7 +310,7 @@ const Contact = () => {
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-7">
+              <div className="space-y-7">
                 {/* Name Field */}
                 <div className="space-y-3">
                   <label className="text-gray-700 font-semibold text-sm flex items-center gap-2">
@@ -255,16 +426,14 @@ const Contact = () => {
                 </div>
 
                 <button
-                  type="submit"
+                  onClick={handleSubmit}
                   disabled={isLoading}
                   className="w-full bg-gradient-to-r from-[#4A4947] to-gray-800 text-white font-bold py-4 px-6 rounded-xl hover:from-gray-800 hover:to-[#4A4947] transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3"
                 >
                   {isLoading ? (
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
-                  ) : isSubmitted ? (
                     <>
-                      <CheckCircle size={20} />
-                      <span>Message Sent Successfully!</span>
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
+                      <span>Sending Message...</span>
                     </>
                   ) : (
                     <>
@@ -273,7 +442,7 @@ const Contact = () => {
                     </>
                   )}
                 </button>
-              </form>
+              </div>
             </div>
 
             {/* Contact Information and Map */}
