@@ -14,24 +14,49 @@ const Contact = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      setIsSubmitted(true);
-      setTimeout(() => setIsSubmitted(false), 3000);
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: '',
-        preferredContact: 'email'
-      });
-    }, 2000);
-  };
+  e.preventDefault();
+  setIsLoading(true);
+
+  try {
+    // Map frontend preferredContact to backend preferred_contact
+    const payload = {
+      ...formData,
+      preferred_contact: formData.preferredContact,
+    };
+
+    const response = await fetch("https://vn-music-academy.onrender.com/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Backend error:", errorData);
+      throw new Error(errorData.error || "Failed to send message");
+    }
+
+    setIsSubmitted(true);
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      subject: "",
+      message: "",
+      preferredContact: "email"
+    });
+
+    setTimeout(() => setIsSubmitted(false), 3000);
+
+  } catch (error) {
+    console.error("Error submitting form:", error);
+    alert("Something went wrong. Please try again later.");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
 
   const handleInputChange = (e) => {
     setFormData({
