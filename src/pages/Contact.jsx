@@ -24,7 +24,7 @@ const Contact = () => {
       preferred_contact: formData.preferredContact,
     };
 
-    const response = await fetch("https://vn-music-academy.onrender.com/api/contact", {
+    const response = await fetch("https://vn-music-academy.onrender.com/api/contact/submit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
