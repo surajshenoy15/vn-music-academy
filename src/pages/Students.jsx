@@ -13,9 +13,9 @@ export default function Students() {
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md">
+    // ✅ Added relative + z-50 so this container sits above any navbar/logo overlay
+    <div className="relative z-50 p-6 bg-white rounded-lg shadow-md">
       <div className="flex space-x-4 mb-6">
-        {/* Add Student Button */}
         <button
           type="button"
           className={`px-4 py-2 rounded cursor-pointer ${
@@ -23,10 +23,9 @@ export default function Students() {
           }`}
           onClick={() => handleTabChange("add")}
         >
-          <span className="pointer-events-none select-none">+ Add Students</span>
+          + Add Students
         </button>
 
-        {/* Students List Button */}
         <button
           type="button"
           className={`px-4 py-2 rounded cursor-pointer ${
@@ -34,11 +33,10 @@ export default function Students() {
           }`}
           onClick={() => handleTabChange("list")}
         >
-          <span className="pointer-events-none select-none">Students List</span>
+          Students List
         </button>
       </div>
 
-      {/* Content */}
       {activeTab === "add" && <AddStudent />}
       {activeTab === "list" && (
         <StudentsList onSelectStudent={setSelectedStudent} />
