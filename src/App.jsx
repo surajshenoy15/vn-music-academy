@@ -9,6 +9,8 @@ import Footer from "./components/Footer";
 import LoginPage from "./components/LoginPage";
 import Register from "./pages/Register";
 import Whatsapp from "./components/Whatsapp";  // ✅ Import WhatsApp component
+import Testimonials from "./pages/Testimonials"; // ✅ Import Testimonials
+import Gallery from "./pages/Gallery"; // ✅ Import Gallery
 
 // Admin Layout + Pages
 import AdminDashboard from "./pages/AdminDashboard";
@@ -21,7 +23,7 @@ import AdminPayment from "./pages/AdminPayment";  // ✅ Import AdminPayment
 import StudentDashboard from "./pages/StudentDashboard";   
 import DashboardStudent from "./pages/Dashboard-student"; 
 import StudentAttendance from "./pages/StudentAttendance"; 
-import StudentPayment from "./pages/StudentPayment"; // ✅ Import StudentsPayment
+import StudentPayment from "./pages/StudentPayment"; // ✅ Import StudentPayment
 
 function App() {
   return (
@@ -65,6 +67,26 @@ function App() {
               <>
                 <Navbar />
                 <Contact />
+                <Footer />
+              </>
+            }
+          />
+          <Route
+            path="/testimonials"
+            element={
+              <>
+                <Navbar />
+                <Testimonials />
+                <Footer />
+              </>
+            }
+          />
+          <Route
+            path="/gallery"
+            element={
+              <>
+                <Navbar />
+                <Gallery />
                 <Footer />
               </>
             }

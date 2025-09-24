@@ -28,28 +28,15 @@ const Navbar = () => {
     checkLoginStatus();
   }, [checkLoginStatus]);
 
- useEffect(() => {
-  const handleStorageChange = (e) => {
-    if (["adminToken", "studentToken"].includes(e.key) || e.key === null) {
-      checkLoginStatus();
-    }
-  };
-
-  const handleLoginEvent = () => {
-    checkLoginStatus();
-  };
-
-  window.addEventListener("storage", handleStorageChange);
-  window.addEventListener("loginSuccess", handleLoginEvent);
-  window.addEventListener("studentLoginSuccess", handleLoginEvent);
-
-  return () => {
-    window.removeEventListener("storage", handleStorageChange);
-    window.removeEventListener("loginSuccess", handleLoginEvent);
-    window.removeEventListener("studentLoginSuccess", handleLoginEvent);
-  };
-}, [checkLoginStatus]);
-
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (["adminToken", "studentToken"].includes(e.key) || e.key === null) {
+        checkLoginStatus();
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, [checkLoginStatus]);
 
   const handleLogout = useCallback(() => {
     localStorage.removeItem("adminToken");
@@ -60,7 +47,7 @@ const Navbar = () => {
   }, [navigate]);
 
   return (
-    <nav className="bg-white text-black shadow-md">
+    <nav className="relative z-50 bg-white text-black shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -94,7 +81,7 @@ const Navbar = () => {
               <button className="px-3 py-2 rounded-md text-lg font-medium transition-all duration-300 ease-in-out hover:bg-[#4A4947] hover:text-white hover:scale-105">
                 Resources
               </button>
-              <div className="absolute left-0 mt-2 w-56 bg-white text-black rounded-xl shadow-xl opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 group-hover:visible invisible transition-all duration-300 ease-out origin-top-left ring-1 ring-black/10">
+              <div className="absolute left-0 mt-2 w-56 bg-white text-black rounded-xl shadow-xl opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 group-hover:visible invisible transition-all duration-300 ease-out origin-top-left ring-1 ring-black/10 z-[60]">
                 <Link
                   to="/gallery"
                   className="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-[#4A4947] rounded-t-xl"
@@ -103,7 +90,7 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/testimonials"
-                  className="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-[#4A4947]"
+                  className="block px-5 py-3 text-sm hover:bg-gray-100 hover:text-[#4A4947] rounded-b-xl"
                 >
                   Testimonials
                 </Link>
@@ -185,7 +172,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white text-black px-4 pb-4 space-y-2">
+        <div className="md:hidden bg-white text-black px-4 pb-4 space-y-2 relative z-[60]">
           <Link
             to="/"
             className="block px-2 py-2 rounded hover:bg-[#4A4947] hover:text-white"
@@ -202,27 +189,28 @@ const Navbar = () => {
             Courses
           </Link>
 
-          <details className="group">
-            <summary className="cursor-pointer px-2 py-2 rounded hover:bg-[#4A4947] hover:text-white">
+          {/* Mobile Resources Dropdown */}
+          <div className="relative group">
+            <button className="block w-full text-left px-2 py-2 rounded hover:bg-[#4A4947] hover:text-white">
               Resources
-            </summary>
-            <div className="ml-4">
+            </button>
+            <div className="pl-4 space-y-1 mt-1">
               <Link
                 to="/gallery"
-                className="block px-2 py-1 text-sm hover:bg-[#4A4947] hover:text-white"
+                className="block px-2 py-2 text-sm rounded hover:bg-gray-100 hover:text-[#4A4947]"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Gallery
               </Link>
               <Link
                 to="/testimonials"
-                className="block px-2 py-1 text-sm hover:bg-[#4A4947] hover:text-white"
+                className="block px-2 py-2 text-sm rounded hover:bg-gray-100 hover:text-[#4A4947]"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Testimonials
               </Link>
             </div>
-          </details>
+          </div>
 
           <Link
             to="/contact"
@@ -270,7 +258,7 @@ const Navbar = () => {
           ) : (
             <Link
               to="/login"
-              className="block px-2 py-2 rounded bg-[#4A4947] text-white hover:bg-gray-800 flex items-center space-x-2"
+              className="block px-2 py-2 rounded bg-[#4A4947] text-white hover:bg-gray-800 flex items-center justify-center space-x-2"
               onClick={() => setIsMenuOpen(false)}
             >
               <i className="fas fa-user"></i>
