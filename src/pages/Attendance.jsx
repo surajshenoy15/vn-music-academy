@@ -68,53 +68,49 @@ const Attendance = () => {
   };
 
   // Create new session (with or without students)
-  const createSession = async () => {
-    if (!sessionTopic.trim()) {
-      alert('Please enter a session name');
-      return;
-    }
-    
-    try {
-      if (selectedStudentsForSession.size === 0) {
-        // Create session with no students - just insert one record with null student_id
-        const { error } = await supabase
-          .from('attendance')
-          .insert([{
-            student_id: null,
-            date: selectedDate,
-            timing: selectedTiming,
-            status: 'present',
-            session_name: sessionTopic.trim()
-          }]);
-        
-        if (error) throw error;
-      } else {
-        // Create attendance records for selected students
-        const attendanceRecords = Array.from(selectedStudentsForSession).map(studentId => ({
-          student_id: studentId,
+const createSession = async () => {
+  try {
+    const sessionName = sessionTopic.trim() || null; // Make optional
+
+    if (selectedStudentsForSession.size === 0) {
+      // Create session with no students
+      const { error } = await supabase
+        .from('attendance')
+        .insert([{
+          student_id: null,
           date: selectedDate,
           timing: selectedTiming,
           status: 'present',
-          session_name: sessionTopic.trim()
-        }));
+          session_name: sessionName
+        }]);
+      if (error) throw error;
+    } else {
+      // Create attendance records for selected students
+      const attendanceRecords = Array.from(selectedStudentsForSession).map(studentId => ({
+        student_id: studentId,
+        date: selectedDate,
+        timing: selectedTiming,
+        status: 'present',
+        session_name: sessionName
+      }));
 
-        const { error } = await supabase
-          .from('attendance')
-          .insert(attendanceRecords);
-        
-        if (error) throw error;
-      }
-      
-      setShowCreateSession(false);
-      setSessionTopic('');
-      setSelectedStudentsForSession(new Set());
-      setShowStudentSelection(false);
-      fetchAttendance();
-    } catch (error) {
-      console.error('Error creating session:', error);
-      alert('Error creating session. Please try again.');
+      const { error } = await supabase
+        .from('attendance')
+        .insert(attendanceRecords);
+      if (error) throw error;
     }
-  };
+
+    setShowCreateSession(false);
+    setSessionTopic('');
+    setSelectedStudentsForSession(new Set());
+    setShowStudentSelection(false);
+    fetchAttendance();
+  } catch (error) {
+    console.error('Error creating session:', error);
+    alert('Error creating session. Please try again.');
+  }
+};
+
 
   // Add student to existing session
   const addStudentToSession = async (sessionDate, sessionTiming, sessionName) => {
@@ -311,7 +307,7 @@ const Attendance = () => {
         sessions[sessionKey] = {
           date: record.date,
           timing: record.timing,
-          session_name: record.session_name || 'Unnamed Session',
+          session_name: record.session_name || '',
           students: []
         };
       }
@@ -533,79 +529,97 @@ const Attendance = () => {
           </div>
           
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Session Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date & Time
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Students Present
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {uniqueSessions.map((session, index) => (
-                  <tr key={`${session.date}-${session.timing}`} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {session.session_name}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {new Date(session.date).toLocaleDateString()}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {session.timing}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <span className="text-sm font-medium text-gray-900 mr-2">
-                          {session.students.length}
-                        </span>
-                        <div className="flex -space-x-1">
-                          {session.students.slice(0, 3).map((student, i) => (
-                            <div
-                              key={student.id}
-                              className="h-6 w-6 rounded-full bg-green-100 border border-white flex items-center justify-center"
-                              title={student.students?.name}
-                            >
-                              <span className="text-xs font-medium text-green-700">
-                                {student.students?.name?.charAt(0) || '?'}
-                              </span>
-                            </div>
-                          ))}
-                          {session.students.length > 3 && (
-                            <div className="h-6 w-6 rounded-full bg-gray-100 border border-white flex items-center justify-center">
-                              <span className="text-xs font-medium text-gray-700">
-                                +{session.students.length - 3}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <button
-                        onClick={() => addStudentToSession(session.date, session.timing, session.session_name)}
-                        className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors mr-2"
-                        title="Add student to session"
-                      >
-                        <Plus size={16} />
-                      </button>
-                    </td>
-                  </tr>
+<table className="w-full">
+  <thead>
+    <tr>
+      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+        Session
+      </th>
+      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+        Date & Time
+      </th>
+      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+        Students Present
+      </th>
+      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+        Actions
+      </th>
+    </tr>
+  </thead>
+  <tbody className="bg-white divide-y divide-gray-200">
+    {uniqueSessions
+      .sort((a, b) => new Date(b.date) - new Date(a.date)) // descending by date
+      .map((session, index, arr) => (
+        <tr key={`${session.date}-${session.timing}`} className="hover:bg-gray-50">
+
+          {/* Serial Number + Session Name in two lines */}
+          <td className="px-6 py-4 whitespace-nowrap">
+            <div className="text-xs text-gray-500">
+              {arr.length - index} {/* Serial number in smaller gray text */}
+            </div>
+            <div className="text-sm text-gray-900 font-medium">
+              {session.session_name || ''} {/* Session name in bold */}
+            </div>
+          </td>
+
+          {/* Date & Time */}
+          <td className="px-6 py-4 whitespace-nowrap">
+            <div className="text-sm text-gray-900">
+              {new Date(session.date).toLocaleDateString()}
+            </div>
+            <div className="text-xs text-gray-500">
+              {session.timing}
+            </div>
+          </td>
+
+          {/* Students Present */}
+          <td className="px-6 py-4 whitespace-nowrap">
+            <div className="flex items-center">
+              <span className="text-sm font-medium text-gray-900 mr-2">
+                {session.students.length}
+              </span>
+              <div className="flex -space-x-1">
+                {session.students.slice(0, 3).map((student) => (
+                  <div
+                    key={student.id}
+                    className="h-6 w-6 rounded-full bg-green-100 border border-white flex items-center justify-center"
+                    title={student.students?.name}
+                  >
+                    <span className="text-xs font-medium text-green-700">
+                      {student.students?.name?.charAt(0) || '?'}
+                    </span>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+                {session.students.length > 3 && (
+                  <div className="h-6 w-6 rounded-full bg-gray-100 border border-white flex items-center justify-center">
+                    <span className="text-xs font-medium text-gray-700">
+                      +{session.students.length - 3}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </td>
+
+          {/* Actions */}
+          <td className="px-6 py-4 whitespace-nowrap">
+            <button
+              onClick={() =>
+                addStudentToSession(session.date, session.timing, session.session_name)
+              }
+              className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
+              title="Add student to session"
+            >
+              <Plus size={16} />
+            </button>
+          </td>
+
+        </tr>
+      ))}
+  </tbody>
+</table>
+
+
             
             {uniqueSessions.length === 0 && (
               <div className="text-center py-12">
@@ -629,68 +643,85 @@ const Attendance = () => {
           
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Student
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Session Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Timing
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
+              <tr>
+  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+    S.No.
+  </th>
+  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+    Student
+  </th>
+  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+    Session Name
+  </th>
+  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+    Date
+  </th>
+  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+    Timing
+  </th>
+  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+    Actions
+  </th>
+</tr>
+
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredAttendance.map((record) => (
-                  <tr key={record.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                          <span className="text-sm font-medium text-green-700">
-                            {record.students?.name?.charAt(0) || '?'}
-                          </span>
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {record.students?.name || 'Unknown'}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {record.students?.email || ''}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {record.session_name || 'Unnamed Session'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {new Date(record.date).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {record.timing}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => removeAttendanceRecord(record.id)}
-                        className="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
-                        title="Remove from session"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+  {filteredAttendance.map((record, index) => (
+    <tr key={record.id} className="hover:bg-gray-50">
+      {/* Serial Number */}
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+        {index + 1}
+      </td>
+
+      {/* Student Info */}
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="flex items-center">
+          <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+            <span className="text-sm font-medium text-green-700">
+              {record.students?.name?.charAt(0) || '?'}
+            </span>
+          </div>
+          <div className="ml-4">
+            <div className="text-sm font-medium text-gray-900">
+              {record.students?.name || 'Unknown'}
+            </div>
+            <div className="text-sm text-gray-500">
+              {record.students?.email || ''}
+            </div>
+          </div>
+        </div>
+      </td>
+
+      {/* Session Name */}
+      <td className="px-6 py-4 whitespace-nowrap">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          {record.session_name || ''}
+        </span>
+      </td>
+
+      {/* Date */}
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+        {new Date(record.date).toLocaleDateString()}
+      </td>
+
+      {/* Timing */}
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+        {record.timing}
+      </td>
+
+      {/* Actions */}
+      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+        <button
+          onClick={() => removeAttendanceRecord(record.id)}
+          className="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
+          title="Remove from session"
+        >
+          <Trash2 size={16} />
+        </button>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
             </table>
             
             {filteredAttendance.length === 0 && (
@@ -759,17 +790,18 @@ const Attendance = () => {
                 </div>
 
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Session Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={sessionTopic}
-                    onChange={(e) => setSessionTopic(e.target.value)}
-                    placeholder="Enter session name..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
-                  />
-                </div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    Session Name <span className="text-gray-400 text-xs">(Optional)</span>
+  </label>
+  <input
+    type="text"
+    value={sessionTopic}
+    onChange={(e) => setSessionTopic(e.target.value)}
+    placeholder="Enter session name (optional)..."
+    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+  />
+</div>
+
 
                 {/* Option to add students */}
                 <div className="mb-6">
@@ -871,18 +903,18 @@ const Attendance = () => {
                     Cancel
                   </button>
                   <button
-                    onClick={createSession}
-                    disabled={!sessionTopic.trim()}
-                    className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                  >
-                    <Plus size={16} />
-                    Create Session
-                    {selectedStudentsForSession.size > 0 && (
-                      <span className="bg-gray-700 px-2 py-1 rounded-full text-xs">
-                        {selectedStudentsForSession.size}
-                      </span>
-                    )}
-                  </button>
+  onClick={createSession}
+  className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
+>
+  <Plus size={16} />
+  Create Session
+  {selectedStudentsForSession.size > 0 && (
+    <span className="bg-gray-700 px-2 py-1 rounded-full text-xs">
+      {selectedStudentsForSession.size}
+    </span>
+  )}
+</button>
+
                 </div>
               </div>
             </div>
