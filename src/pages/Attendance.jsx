@@ -27,6 +27,7 @@ const Attendance = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [showStudentSelection, setShowStudentSelection] = useState(false);
+  const [modalSearchTerm, setModalSearchTerm] = useState('');
 
   // Fetch students from Supabase
   const fetchStudents = async () => {
@@ -819,63 +820,96 @@ const createSession = async () => {
                   </div>
 
                   {showStudentSelection && (
-                    <div>
-                      <div className="flex justify-between items-center mb-4">
-                        <span className="text-sm text-gray-600">
-                          {selectedStudentsForSession.size} student{selectedStudentsForSession.size !== 1 ? 's' : ''} selected
-                        </span>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={selectAllStudents}
-                            className="px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm"
-                          >
-                            Select All
-                          </button>
-                          <button
-                            onClick={deselectAllStudents}
-                            className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
-                          >
-                            Clear All
-                          </button>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-3">
-                        {students.map(student => (
-                          <div 
-                            key={student.id} 
-                            className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors ${
-                              selectedStudentsForSession.has(student.id)
-                                ? 'bg-green-50 border border-green-200'
-                                : 'bg-gray-50 hover:bg-gray-100'
-                            }`}
-                            onClick={() => toggleStudentSelection(student.id)}
-                          >
-                            <div className={`h-8 w-8 rounded-full flex items-center justify-center mr-3 ${
-                              selectedStudentsForSession.has(student.id)
-                                ? 'bg-green-200'
-                                : 'bg-gray-300'
-                            }`}>
-                              {selectedStudentsForSession.has(student.id) ? (
-                                <Check size={16} className="text-green-700" />
-                              ) : (
-                                <span className="text-xs font-medium text-gray-700">
-                                  {student.name?.charAt(0) || '?'}
-                                </span>
-                              )}
-                            </div>
-                            <span className={`text-sm font-medium ${
-                              selectedStudentsForSession.has(student.id)
-                                ? 'text-green-900'
-                                : 'text-gray-900'
-                            }`}>
-                              {student.name}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+  <div>
+    {/* Search Bar */}
+    <div className="mb-4">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+        <input
+          type="text"
+          placeholder="Search students..."
+          value={modalSearchTerm}
+          onChange={(e) => setModalSearchTerm(e.target.value)}
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+        />
+      </div>
+    </div>
+
+    <div className="flex justify-between items-center mb-4">
+      <span className="text-sm text-gray-600">
+        {selectedStudentsForSession.size} student{selectedStudentsForSession.size !== 1 ? 's' : ''} selected
+      </span>
+      <div className="flex gap-2">
+        <button
+          onClick={selectAllStudents}
+          className="px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm"
+        >
+          Select All
+        </button>
+        <button
+          onClick={deselectAllStudents}
+          className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+        >
+          Clear All
+        </button>
+      </div>
+    </div>
+    
+    <div className="space-y-2 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-3">
+      {students
+        .filter(student => 
+          student.name?.toLowerCase().includes(modalSearchTerm.toLowerCase()) ||
+          student.email?.toLowerCase().includes(modalSearchTerm.toLowerCase())
+        )
+        .map(student => (
+        <div 
+          key={student.id} 
+          className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors ${
+            selectedStudentsForSession.has(student.id)
+              ? 'bg-green-50 border border-green-200'
+              : 'bg-gray-50 hover:bg-gray-100'
+          }`}
+          onClick={() => toggleStudentSelection(student.id)}
+        >
+          <div className={`h-8 w-8 rounded-full flex items-center justify-center mr-3 ${
+            selectedStudentsForSession.has(student.id)
+              ? 'bg-green-200'
+              : 'bg-gray-300'
+          }`}>
+            {selectedStudentsForSession.has(student.id) ? (
+              <Check size={16} className="text-green-700" />
+            ) : (
+              <span className="text-xs font-medium text-gray-700">
+                {student.name?.charAt(0) || '?'}
+              </span>
+            )}
+          </div>
+          <div className="flex-1">
+            <span className={`text-sm font-medium block ${
+              selectedStudentsForSession.has(student.id)
+                ? 'text-green-900'
+                : 'text-gray-900'
+            }`}>
+              {student.name}
+            </span>
+            {student.email && (
+              <span className="text-xs text-gray-500">{student.email}</span>
+            )}
+          </div>
+        </div>
+      ))}
+      {students.filter(student => 
+        student.name?.toLowerCase().includes(modalSearchTerm.toLowerCase()) ||
+        student.email?.toLowerCase().includes(modalSearchTerm.toLowerCase())
+      ).length === 0 && (
+        <div className="text-center py-8 text-gray-500">
+          <Search className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+          <p className="text-sm">No students found</p>
+        </div>
+      )}
+    </div>
+  </div>
+)}
                 </div>
 
                 {!showStudentSelection && (
