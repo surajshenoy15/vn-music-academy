@@ -27,6 +27,8 @@ const StudentAttendance = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+const ITEMS_PER_PAGE = 10;
   const [stats, setStats] = useState({
     total: 0,
     present: 0,
@@ -142,6 +144,10 @@ const StudentAttendance = () => {
     fetchStudentData();
   }, []);
 
+  useEffect(() => {
+  setCurrentPage(1);
+}, [searchTerm, filterType]);
+
   // ✅ Keeping same helper functions
   const formatDate = (dateString) =>
     new Date(dateString).toLocaleDateString("en-GB");
@@ -188,6 +194,102 @@ const StudentAttendance = () => {
       </div>
     );
   }
+
+
+  // Pagination helpers
+const getPaginatedAttendance = () => {
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  return filteredAttendance.slice(startIndex, endIndex);
+};
+
+const totalPages = Math.ceil(filteredAttendance.length / ITEMS_PER_PAGE);
+
+// Pagination Component
+const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+    
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) pages.push(i);
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
+  };
+
+  return (
+    <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+      <div className="text-sm text-gray-700">
+        Showing <span className="font-medium">{((currentPage - 1) * ITEMS_PER_PAGE) + 1}</span> to{' '}
+        <span className="font-medium">{Math.min(currentPage * ITEMS_PER_PAGE, filteredAttendance.length)}</span> of{' '}
+        <span className="font-medium">{filteredAttendance.length}</span> results
+      </div>
+      
+      <div className="flex gap-2">
+        <button
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`px-3 py-1 rounded-lg text-sm font-medium ${
+            currentPage === 1
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-gray-900 text-white hover:bg-gray-800'
+          }`}
+        >
+          Previous
+        </button>
+        
+        {getPageNumbers().map((page, index) => (
+          page === '...' ? (
+            <span key={`ellipsis-${index}`} className="px-3 py-1 text-gray-500">...</span>
+          ) : (
+            <button
+              key={page}
+              onClick={() => onPageChange(page)}
+              className={`px-3 py-1 rounded-lg text-sm font-medium ${
+                currentPage === page
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {page}
+            </button>
+          )
+        ))}
+        
+        <button
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={`px-3 py-1 rounded-lg text-sm font-medium ${
+            currentPage === totalPages
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-gray-900 text-white hover:bg-gray-800'
+          }`}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+};
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -329,42 +431,50 @@ const StudentAttendance = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredAttendance.map((record) => (
-                  <tr key={record.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {formatDate(record.date)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {record.session_name || "Regular Session"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Clock size={14} />
-                        {record.timing}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {getStatusBadge(record.status)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+  {getPaginatedAttendance().map((record) => (
+    <tr key={record.id} className="hover:bg-gray-50">
+      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        {formatDate(record.date)}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          {record.session_name || "Regular Session"}
+        </span>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <Clock size={14} />
+          {record.timing}
+        </div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        {getStatusBadge(record.status)}
+      </td>
+    </tr>
+  ))}
+</tbody>
             </table>
             
-            {filteredAttendance.length === 0 && (
-              <div className="text-center py-12">
-                <Calendar className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No attendance records found</h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  {searchTerm || filterType !== 'all' 
-                    ? 'Try adjusting your filters or search term.'
-                    : 'Your attendance history will appear here once recorded.'
-                  }
-                </p>
-              </div>
-            )}
+            {filteredAttendance.length > ITEMS_PER_PAGE && (
+  <Pagination 
+    currentPage={currentPage}
+    totalPages={totalPages}
+    onPageChange={setCurrentPage}
+  />
+)}
+
+{filteredAttendance.length === 0 && (
+  <div className="text-center py-12">
+    <Calendar className="mx-auto h-12 w-12 text-gray-400" />
+    <h3 className="mt-2 text-sm font-medium text-gray-900">No attendance records found</h3>
+    <p className="mt-1 text-sm text-gray-500">
+      {searchTerm || filterType !== 'all' 
+        ? 'Try adjusting your filters or search term.'
+        : 'Your attendance history will appear here once recorded.'
+      }
+    </p>
+  </div>
+)}
           </div>
         </div>
       </div>

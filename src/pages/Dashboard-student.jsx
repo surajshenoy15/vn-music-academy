@@ -14,6 +14,8 @@ export default function DashboardStudent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+const ITEMS_PER_PAGE = 10;
   const [editForm, setEditForm] = useState({
     name: "",
     email: "",
@@ -295,6 +297,101 @@ export default function DashboardStudent() {
     ? Math.ceil((new Date() - new Date(student.joined_at)) / (1000 * 60 * 60 * 24))
     : 0;
 
+    // Pagination helpers
+const getPaginatedAttendance = () => {
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  return attendance.slice(startIndex, endIndex);
+};
+
+const totalPages = Math.ceil(attendance.length / ITEMS_PER_PAGE);
+
+// Pagination Component
+const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+    
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) pages.push(i);
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
+  };
+
+  return (
+    <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+      <div className="text-sm text-gray-700">
+        Showing <span className="font-medium">{((currentPage - 1) * ITEMS_PER_PAGE) + 1}</span> to{' '}
+        <span className="font-medium">{Math.min(currentPage * ITEMS_PER_PAGE, attendance.length)}</span> of{' '}
+        <span className="font-medium">{attendance.length}</span> results
+      </div>
+      
+      <div className="flex gap-2">
+        <button
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`px-3 py-1 rounded-lg text-sm font-medium ${
+            currentPage === 1
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-[#4A4947] text-white hover:bg-opacity-90'
+          }`}
+        >
+          Previous
+        </button>
+        
+        {getPageNumbers().map((page, index) => (
+          page === '...' ? (
+            <span key={`ellipsis-${index}`} className="px-3 py-1 text-gray-500">...</span>
+          ) : (
+            <button
+              key={page}
+              onClick={() => onPageChange(page)}
+              className={`px-3 py-1 rounded-lg text-sm font-medium ${
+                currentPage === page
+                  ? 'bg-[#4A4947] text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {page}
+            </button>
+          )
+        ))}
+        
+        <button
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={`px-3 py-1 rounded-lg text-sm font-medium ${
+            currentPage === totalPages
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-[#4A4947] text-white hover:bg-opacity-90'
+          }`}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+};
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
@@ -561,34 +658,42 @@ export default function DashboardStudent() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {attendance.map((att, index) => (
-                    <tr key={att.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="py-4 px-6 font-medium text-[#4A4947]">
-                        {new Date(att.date).toLocaleDateString('en-US', { 
-                          weekday: 'short', 
-                          year: 'numeric', 
-                          month: 'short', 
-                          day: 'numeric' 
-                        })}
-                      </td>
-                      <td className="py-4 px-6 text-gray-600">{att.timing}</td>
-                      <td className="py-4 px-6">
-                        <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
-                          att.status === 'present'
-                            ? 'bg-green-100 text-green-700' 
-                            : 'bg-red-100 text-red-700'
-                        }`}>
-                          {att.status === 'present' ? <CheckCircle size={14} /> : <XCircle size={14} />}
-                          {att.status}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6 text-gray-600">{att.session_name || "-"}</td>
-                    </tr>
-                  ))}
-                </tbody>
+  {getPaginatedAttendance().map((att, index) => (
+    <tr key={att.id} className="hover:bg-gray-50 transition-colors">
+      <td className="py-4 px-6 font-medium text-[#4A4947]">
+        {new Date(att.date).toLocaleDateString('en-US', { 
+          weekday: 'short', 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric' 
+        })}
+      </td>
+      <td className="py-4 px-6 text-gray-600">{att.timing}</td>
+      <td className="py-4 px-6">
+        <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
+          att.status === 'present'
+            ? 'bg-green-100 text-green-700' 
+            : 'bg-red-100 text-red-700'
+        }`}>
+          {att.status === 'present' ? <CheckCircle size={14} /> : <XCircle size={14} />}
+          {att.status}
+        </span>
+      </td>
+      <td className="py-4 px-6 text-gray-600">{att.session_name || "-"}</td>
+    </tr>
+  ))}
+</tbody>
               </table>
             )}
           </div>
+          {/* Pagination Controls */}
+          {attendance.length > ITEMS_PER_PAGE && (
+            <Pagination 
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          )}
         </div>
 
         {/* Feedback Section */}
