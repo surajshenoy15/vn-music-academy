@@ -28,6 +28,9 @@ const Attendance = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [showStudentSelection, setShowStudentSelection] = useState(false);
   const [modalSearchTerm, setModalSearchTerm] = useState('');
+  const [sessionsCurrentPage, setSessionsCurrentPage] = useState(1);
+const [attendanceCurrentPage, setAttendanceCurrentPage] = useState(1);
+const ITEMS_PER_PAGE = 10;
 
   // Fetch students from Supabase
   const fetchStudents = async () => {
@@ -344,6 +347,105 @@ const createSession = async () => {
     );
   }
 
+  const getPaginatedSessions = () => {
+  const startIndex = (sessionsCurrentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  return uniqueSessions.slice(startIndex, endIndex);
+};
+
+const getPaginatedAttendance = () => {
+  const startIndex = (attendanceCurrentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  return filteredAttendance.slice(startIndex, endIndex);
+};
+
+const sessionsTotalPages = Math.ceil(uniqueSessions.length / ITEMS_PER_PAGE);
+const attendanceTotalPages = Math.ceil(filteredAttendance.length / ITEMS_PER_PAGE);
+
+// Pagination Component
+const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+    
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) pages.push(i);
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
+  };
+  return (
+    <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+      <div className="text-sm text-gray-700">
+        Showing <span className="font-medium">{((currentPage - 1) * ITEMS_PER_PAGE) + 1}</span> to{' '}
+        <span className="font-medium">{Math.min(currentPage * ITEMS_PER_PAGE, totalPages * ITEMS_PER_PAGE)}</span>
+      </div>
+      
+      <div className="flex gap-2">
+        <button
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`px-3 py-1 rounded-lg text-sm font-medium ${
+            currentPage === 1
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-gray-900 text-white hover:bg-gray-800'
+          }`}
+        >
+          Previous
+        </button>
+        
+        {getPageNumbers().map((page, index) => (
+          page === '...' ? (
+            <span key={`ellipsis-${index}`} className="px-3 py-1 text-gray-500">...</span>
+          ) : (
+            <button
+              key={page}
+              onClick={() => onPageChange(page)}
+              className={`px-3 py-1 rounded-lg text-sm font-medium ${
+                currentPage === page
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {page}
+            </button>
+          )
+        ))}
+        
+        <button
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={`px-3 py-1 rounded-lg text-sm font-medium ${
+            currentPage === totalPages
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-gray-900 text-white hover:bg-gray-800'
+          }`}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+};
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
@@ -548,89 +650,100 @@ const createSession = async () => {
     </tr>
   </thead>
   <tbody className="bg-white divide-y divide-gray-200">
-    {uniqueSessions
-      .sort((a, b) => new Date(b.date) - new Date(a.date)) // descending by date
-      .map((session, index, arr) => (
-        <tr key={`${session.date}-${session.timing}`} className="hover:bg-gray-50">
+  {getPaginatedSessions().map((session, index) => {
+    const globalIndex = (sessionsCurrentPage - 1) * ITEMS_PER_PAGE + index;
+    const totalSessions = uniqueSessions.length;
+    
+    return (
+      <tr key={`${session.date}-${session.timing}`} className="hover:bg-gray-50">
+        {/* Serial Number + Session Name in two lines */}
+        <td className="px-6 py-4 whitespace-nowrap">
+          <div className="text-xs text-gray-500">
+            {totalSessions - globalIndex} {/* Serial number in smaller gray text */}
+          </div>
+          <div className="text-sm text-gray-900 font-medium">
+            {session.session_name || ''} {/* Session name in bold */}
+          </div>
+        </td>
 
-          {/* Serial Number + Session Name in two lines */}
-          <td className="px-6 py-4 whitespace-nowrap">
-            <div className="text-xs text-gray-500">
-              {arr.length - index} {/* Serial number in smaller gray text */}
-            </div>
-            <div className="text-sm text-gray-900 font-medium">
-              {session.session_name || ''} {/* Session name in bold */}
-            </div>
-          </td>
+        {/* Date & Time */}
+        <td className="px-6 py-4 whitespace-nowrap">
+          <div className="text-sm text-gray-900">
+            {new Date(session.date).toLocaleDateString()}
+          </div>
+          <div className="text-xs text-gray-500">
+            {session.timing}
+          </div>
+        </td>
 
-          {/* Date & Time */}
-          <td className="px-6 py-4 whitespace-nowrap">
-            <div className="text-sm text-gray-900">
-              {new Date(session.date).toLocaleDateString()}
+        {/* Students Present */}
+        <td className="px-6 py-4 whitespace-nowrap">
+          <div className="flex items-center">
+            <span className="text-sm font-medium text-gray-900 mr-2">
+              {session.students.length}
+            </span>
+            <div className="flex -space-x-1">
+              {session.students.slice(0, 3).map((student) => (
+                <div
+                  key={student.id}
+                  className="h-6 w-6 rounded-full bg-green-100 border border-white flex items-center justify-center"
+                  title={student.students?.name}
+                >
+                  <span className="text-xs font-medium text-green-700">
+                    {student.students?.name?.charAt(0) || '?'}
+                  </span>
+                </div>
+              ))}
+              {session.students.length > 3 && (
+                <div className="h-6 w-6 rounded-full bg-gray-100 border border-white flex items-center justify-center">
+                  <span className="text-xs font-medium text-gray-700">
+                    +{session.students.length - 3}
+                  </span>
+                </div>
+              )}
             </div>
-            <div className="text-xs text-gray-500">
-              {session.timing}
-            </div>
-          </td>
+          </div>
+        </td>
 
-          {/* Students Present */}
-          <td className="px-6 py-4 whitespace-nowrap">
-            <div className="flex items-center">
-              <span className="text-sm font-medium text-gray-900 mr-2">
-                {session.students.length}
-              </span>
-              <div className="flex -space-x-1">
-                {session.students.slice(0, 3).map((student) => (
-                  <div
-                    key={student.id}
-                    className="h-6 w-6 rounded-full bg-green-100 border border-white flex items-center justify-center"
-                    title={student.students?.name}
-                  >
-                    <span className="text-xs font-medium text-green-700">
-                      {student.students?.name?.charAt(0) || '?'}
-                    </span>
-                  </div>
-                ))}
-                {session.students.length > 3 && (
-                  <div className="h-6 w-6 rounded-full bg-gray-100 border border-white flex items-center justify-center">
-                    <span className="text-xs font-medium text-gray-700">
-                      +{session.students.length - 3}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </td>
-
-          {/* Actions */}
-          <td className="px-6 py-4 whitespace-nowrap">
-            <button
-              onClick={() =>
-                addStudentToSession(session.date, session.timing, session.session_name)
-              }
-              className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
-              title="Add student to session"
-            >
-              <Plus size={16} />
-            </button>
-          </td>
-
-        </tr>
-      ))}
-  </tbody>
+        {/* Actions */}
+        <td className="px-6 py-4 whitespace-nowrap">
+          <button
+            onClick={() =>
+              addStudentToSession(session.date, session.timing, session.session_name)
+            }
+            className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
+            title="Add student to session"
+          >
+            <Plus size={16} />
+          </button>
+        </td>
+      </tr>
+    );
+  })}
+</tbody>
 </table>
+
+{uniqueSessions.length > ITEMS_PER_PAGE && (
+  <Pagination 
+    currentPage={sessionsCurrentPage}
+    totalPages={sessionsTotalPages}
+    onPageChange={setSessionsCurrentPage}
+  />
+)}
+
+{uniqueSessions.length === 0 && (
+  <div className="text-center py-12">
+    <Calendar className="mx-auto h-12 w-12 text-gray-400" />
+    <h3 className="mt-2 text-sm font-medium text-gray-900">No sessions found</h3>
+    <p className="mt-1 text-sm text-gray-500">
+      No sessions match the selected filters.
+    </p>
+  </div>
+)}
 
 
             
-            {uniqueSessions.length === 0 && (
-              <div className="text-center py-12">
-                <Calendar className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No sessions found</h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  No sessions match the selected filters.
-                </p>
-              </div>
-            )}
+            
           </div>
         </div>
 
@@ -665,75 +778,88 @@ const createSession = async () => {
   </th>
 </tr>
 
-              <tbody className="bg-white divide-y divide-gray-200">
-  {filteredAttendance.map((record, index) => (
-    <tr key={record.id} className="hover:bg-gray-50">
-      {/* Serial Number */}
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-        {index + 1}
-      </td>
+            <tbody className="bg-white divide-y divide-gray-200">
+  {getPaginatedAttendance().map((record, index) => {
+    const globalIndex = (attendanceCurrentPage - 1) * ITEMS_PER_PAGE + index;
+    
+    return (
+      <tr key={record.id} className="hover:bg-gray-50">
+        {/* Serial Number */}
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+          {globalIndex + 1}
+        </td>
 
-      {/* Student Info */}
-      <td className="px-6 py-4 whitespace-nowrap">
-        <div className="flex items-center">
-          <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-            <span className="text-sm font-medium text-green-700">
-              {record.students?.name?.charAt(0) || '?'}
-            </span>
-          </div>
-          <div className="ml-4">
-            <div className="text-sm font-medium text-gray-900">
-              {record.students?.name || 'Unknown'}
+        {/* Student Info */}
+        <td className="px-6 py-4 whitespace-nowrap">
+          <div className="flex items-center">
+            <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+              <span className="text-sm font-medium text-green-700">
+                {record.students?.name?.charAt(0) || '?'}
+              </span>
             </div>
-            <div className="text-sm text-gray-500">
-              {record.students?.email || ''}
+            <div className="ml-4">
+              <div className="text-sm font-medium text-gray-900">
+                {record.students?.name || 'Unknown'}
+              </div>
+              <div className="text-sm text-gray-500">
+                {record.students?.email || ''}
+              </div>
             </div>
           </div>
-        </div>
-      </td>
+        </td>
 
-      {/* Session Name */}
-      <td className="px-6 py-4 whitespace-nowrap">
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-          {record.session_name || ''}
-        </span>
-      </td>
+        {/* Session Name */}
+        <td className="px-6 py-4 whitespace-nowrap">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            {record.session_name || ''}
+          </span>
+        </td>
 
-      {/* Date */}
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-        {new Date(record.date).toLocaleDateString()}
-      </td>
+        {/* Date */}
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+          {new Date(record.date).toLocaleDateString()}
+        </td>
 
-      {/* Timing */}
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-        {record.timing}
-      </td>
+        {/* Timing */}
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+          {record.timing}
+        </td>
 
-      {/* Actions */}
-      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-        <button
-          onClick={() => removeAttendanceRecord(record.id)}
-          className="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
-          title="Remove from session"
-        >
-          <Trash2 size={16} />
-        </button>
-      </td>
-    </tr>
-  ))}
+        {/* Actions */}
+        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+          <button
+            onClick={() => removeAttendanceRecord(record.id)}
+            className="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
+            title="Remove from session"
+          >
+            <Trash2 size={16} />
+          </button>
+        </td>
+      </tr>
+    );
+  })}
 </tbody>
 
             </table>
+
+            {filteredAttendance.length > ITEMS_PER_PAGE && (
+  <Pagination 
+    currentPage={attendanceCurrentPage}
+    totalPages={attendanceTotalPages}
+    onPageChange={setAttendanceCurrentPage}
+  />
+)}
+
+{filteredAttendance.length === 0 && (
+  <div className="text-center py-12">
+    <Users className="mx-auto h-12 w-12 text-gray-400" />
+    <h3 className="mt-2 text-sm font-medium text-gray-900">No students present</h3>
+    <p className="mt-1 text-sm text-gray-500">
+      No students were present for the selected filters.
+    </p>
+  </div>
+)}
             
-            {filteredAttendance.length === 0 && (
-              <div className="text-center py-12">
-                <Users className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No students present</h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  No students were present for the selected filters.
-                </p>
-              </div>
-            )}
           </div>
         </div>
 
