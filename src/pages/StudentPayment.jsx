@@ -121,13 +121,15 @@ const StudentPayment = () => {
       handler: async function (response) {
         try {
           const { error } = await supabase.from("fee_records").insert([
-            {
-              student_id: studentRecord.id,
-              amount,
-              status: "paid",
-              payment_id: response.razorpay_payment_id,
-            },
-          ]);
+  {
+    student_id: studentRecord.id,
+    total_fee: studentRecord.fee || 5000,  // match your student's total fee
+    due_date: new Date().toISOString().split("T")[0], // or use actual due date logic
+    status: "Paid",
+    razorpay_payment_id: response.razorpay_payment_id,
+  },
+]);
+
           
           if (error) throw error;
 
