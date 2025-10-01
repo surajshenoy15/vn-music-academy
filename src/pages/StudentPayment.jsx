@@ -470,7 +470,7 @@ const StudentPayment = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="text-lg font-semibold text-[#4A4947]">
-                        ₹{record.amount.toLocaleString()}
+                        ₹{record.total_fee.toLocaleString()}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
