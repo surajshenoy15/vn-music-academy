@@ -118,17 +118,17 @@ const Footer = () => {
               </h3>
               <ul className="space-y-1 text-sm">
                 <li>
-                  <Link to="/guitar-classes" className="hover:text-gray-200 transition-colors">
+                  <Link to="/courses" className="hover:text-gray-200 transition-colors">
                     Guitar Classes
                   </Link>
                 </li>
                 <li>
-                  <Link to="/piano-classes" className="hover:text-gray-200 transition-colors">
+                  <Link to="/courses" className="hover:text-gray-200 transition-colors">
                     Piano/Keyboard
                   </Link>
                 </li>
                 <li>
-                  <Link to="/music-production" className="hover:text-gray-200 transition-colors">
+                  <Link to="/courses" className="hover:text-gray-200 transition-colors">
                     Music Production
                   </Link>
                 </li>
