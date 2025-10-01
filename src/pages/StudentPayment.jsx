@@ -89,83 +89,93 @@ const StudentPayment = () => {
 
   // Calculate payment statistics
   const calculateStats = (studentData, feeData) => {
-    const totalFee = studentData.fee || 5000;
-    const paidRecords = feeData.filter(record => record.status === "paid");
-    const totalPaid = paidRecords.reduce((sum, record) => sum + record.amount, 0);
-    const pendingAmount = totalFee - totalPaid;
-    const paymentCount = paidRecords.length;
+  const totalFee = studentData.fee || 5000;
 
-    setStats({
-      totalFee,
-      totalPaid,
-      pendingAmount: Math.max(0, pendingAmount),
-      paymentCount,
-    });
-  };
+  // Only consider records with status "Paid" (capital P)
+  const paidRecords = feeData.filter(record => record.status === "Paid");
+
+  // Sum the total_fee for paid records
+  const totalPaid = paidRecords.reduce((sum, record) => sum + Number(record.total_fee), 0);
+
+  const pendingAmount = totalFee - totalPaid;
+  const paymentCount = paidRecords.length;
+
+  setStats({
+    totalFee,
+    totalPaid,
+    pendingAmount: Math.max(0, pendingAmount),
+    paymentCount,
+  });
+};
 
   // Handle Razorpay payment
   const handlePayment = async (amount) => {
-    if (!studentRecord) {
-      alert("Student data not loaded. Please refresh the page.");
-      return;
-    }
+  if (!studentRecord) {
+    alert("Student data not loaded. Please refresh the page.");
+    return;
+  }
 
-    setPaymentLoading(true);
+  setPaymentLoading(true);
 
-    const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-      amount: amount * 100, // Convert to paise
-      currency: "INR",
-      name: "Student Fee Payment",
-      description: `Fee payment for ${student.name}`,
-      handler: async function (response) {
-        try {
-          const { error } = await supabase.from("fee_records").insert([
-  {
-    student_id: studentRecord.id,
-    total_fee: studentRecord.fee || 5000,  // match your student's total fee
-    due_date: new Date().toISOString().split("T")[0], // or use actual due date logic
-    status: "Paid",
-    razorpay_payment_id: response.razorpay_payment_id,
-  },
-]);
+  const options = {
+    key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+    amount: amount * 100, // Convert to paise
+    currency: "INR",
+    name: "Student Fee Payment",
+    description: `Fee payment for ${student.name}`,
+    handler: async function (response) {
+      try {
+        const { error } = await supabase.from("fee_records").insert([
+          {
+            student_id: studentRecord.id,
+            total_fee: studentRecord.fee || 5000,
+            due_date: new Date().toISOString().split("T")[0],
+            status: "Paid",
+            razorpay_payment_id: response.razorpay_payment_id,
+          },
+        ]);
 
-          
-          if (error) throw error;
+        if (error) throw error;
 
-          alert("Payment successful! 🎉");
-          fetchStudentData(); // Refresh data
-        } catch (err) {
-          console.error("Error saving payment:", err);
-          alert("Payment completed but failed to save record. Please contact support.");
-        }
-      },
-      prefill: {
-        name: student.name,
-        email: student.email,
-        contact: studentRecord.phone || "",
-      },
-      theme: { color: "#4A4947" },
-      modal: {
-        ondismiss: function() {
-          setPaymentLoading(false);
-        }
-      }
-    };
+        alert("Payment successful! 🎉");
 
-    try {
-      const rzp = new window.Razorpay(options);
-      rzp.on('payment.failed', function (response) {
-        alert('Payment failed. Please try again.');
+        // ✅ Refresh student data and stats immediately
+        await fetchStudentData();
+      } catch (err) {
+        console.error("Error saving payment:", err);
+        alert(
+          "Payment completed but failed to save record. Please contact support."
+        );
+      } finally {
         setPaymentLoading(false);
-      });
-      rzp.open();
-    } catch (error) {
-      console.error("Razorpay error:", error);
-      alert("Payment gateway error. Please try again.");
-      setPaymentLoading(false);
-    }
+      }
+    },
+    prefill: {
+      name: student.name,
+      email: student.email,
+      contact: studentRecord.phone || "",
+    },
+    theme: { color: "#4A4947" },
+    modal: {
+      ondismiss: function () {
+        setPaymentLoading(false);
+      },
+    },
   };
+
+  try {
+    const rzp = new window.Razorpay(options);
+    rzp.on("payment.failed", function (response) {
+      alert("Payment failed. Please try again.");
+      setPaymentLoading(false);
+    });
+    rzp.open();
+  } catch (error) {
+    console.error("Razorpay error:", error);
+    alert("Payment gateway error. Please try again.");
+    setPaymentLoading(false);
+  }
+};
 
   // Get filtered fee records
   const getFilteredFeeRecords = () => {
