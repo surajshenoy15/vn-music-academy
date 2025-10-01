@@ -71,20 +71,20 @@ function AdminPayment() {
   };
 
   const getPendingFeeRecord = (studentId, totalFee) => {
-    const paidRecords = feeRecords.filter(
-      (r) => r.student_id === studentId && r.status === "paid"
-    );
-    const totalPaid = paidRecords.reduce((sum, r) => sum + r.amount, 0);
-    return totalFee - totalPaid;
-  };
+  const paidRecords = feeRecords.filter(
+    (r) => r.student_id === studentId && r.status === "Paid" // ✅ Capital P
+  );
+  const totalPaid = paidRecords.reduce((sum, r) => sum + Number(r.total_fee), 0); // use total_fee
+  return totalFee - totalPaid;
+};
 
-const handlePayment = async () => {
+
+const handlePayment = async (student, amount) => {
   try {
-    // 1. Create an order on your backend
     const res = await fetch("https://vn-music-academy.onrender.com/api/payment/create-order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: 1 }), // ₹1 for testing
+      body: JSON.stringify({ amount }), // pass actual pending amount
     });
 
     const data = await res.json();
@@ -95,55 +95,48 @@ const handlePayment = async () => {
 
     const order = data.order;
 
-    // 2. Open Razorpay checkout
     const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID, // ✅ Vite way
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
       amount: order.amount,
       currency: order.currency,
       name: "VN Music Academy",
       description: "Payment for Course",
       order_id: order.id,
-     handler: async function (response) {
-  // 1. Verify payment with backend
-  const verifyRes = await fetch("https://vn-music-academy.onrender.com/api/payment/verify-payment", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(response),
-  });
+      handler: async function (response) {
+        const verifyRes = await fetch("https://vn-music-academy.onrender.com/api/payment/verify-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(response),
+        });
+        const verifyData = await verifyRes.json();
 
-  const verifyData = await verifyRes.json();
+        if (verifyData.success) {
+          alert("✅ Payment successful!");
 
-  if (verifyData.success) {
-    alert("✅ Payment successful!");
+          // Save record
+          const { error } = await supabase.from("fee_records").insert([
+            {
+              student_id: student.id,
+              total_fee: amount,       // ✅ Use the actual pending amount
+              status: "Paid",          // ✅ Capital P
+              razorpay_payment_id: response.razorpay_payment_id,
+            },
+          ]);
 
-    // 2. Save record in Supabase
-    const { data, error } = await supabase
-      .from("fee_records")
-      .insert([
-        {
-          student_id: selectedStudent.id,        // who paid
-          total_fee: pendingAmount,              // how much
-          status: "Paid",                        // mark paid
-          razorpay_payment_id: response.razorpay_payment_id,
-        },
-      ]);
-
-    if (error) {
-      console.error("Error saving payment:", error);
-      alert("⚠️ Payment verified but record not saved in DB");
-    } else {
-      alert("💾 Payment stored in database!");
-      fetchStudents(); // refresh table
-    }
-  } else {
-    alert("❌ Payment verification failed");
-  }
-},
-
+          if (error) {
+            console.error("Error saving payment:", error);
+            alert("⚠️ Payment verified but record not saved in DB");
+          } else {
+            fetchStudents(); // refresh table and stats
+          }
+        } else {
+          alert("❌ Payment verification failed");
+        }
+      },
       prefill: {
-        name: "Student Name",
-        email: "student@example.com",
-        contact: "9876543210",
+        name: student.name,
+        email: student.email,
+        contact: student.phone || "",
       },
       theme: { color: "#4A4947" },
     };
@@ -395,12 +388,13 @@ const handlePayment = async () => {
                           </button>
                           {pendingAmount > 0 ? (
                             <button
-                              onClick={() => handlePayment(student, pendingAmount)}
-                              className="inline-flex items-center px-3 py-2 bg-green-500 text-white rounded-lg text-xs font-medium hover:bg-green-600 transition-colors"
-                            >
-                              <CreditCard size={14} className="mr-1" />
-                              Pay Now
-                            </button>
+  onClick={() => handlePayment(student, pendingAmount)} // ✅ pass pendingAmount
+  className="inline-flex items-center px-3 py-2 bg-green-500 text-white rounded-lg text-xs font-medium hover:bg-green-600 transition-colors"
+>
+  <CreditCard size={14} className="mr-1" />
+  Pay Now
+</button>
+
                           ) : (
                             <span className="inline-flex items-center px-3 py-2 bg-green-100 text-green-700 rounded-lg text-xs font-medium">
                               <CheckCircle size={14} className="mr-1" />
