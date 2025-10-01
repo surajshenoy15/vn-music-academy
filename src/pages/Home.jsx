@@ -1,8 +1,49 @@
-import React from 'react';
-import { Guitar, Piano, Music } from 'lucide-react';
+import React, { useState } from 'react';
+import { Guitar, Piano, Music, Play, X } from 'lucide-react';
 import { Link } from "react-router-dom";
 
 const Home = () => {
+  const [activeVideo, setActiveVideo] = useState(null);
+
+  const testimonials = [
+    {
+      id: 1,
+      name: "Harshith Bhat",
+      thumbnail: "/harshith-bhat.jpg",
+      quote: "The guidance and support I received at VN Academy transformed my musical journey completely.",
+      youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ" // Replace with actual video ID
+    },
+    {
+      id: 2,
+      name: "Rohan Shetty",
+      thumbnail: "/rohan-shetty.jpg",
+      quote: "Learning music production here opened doors to opportunities I never imagined.",
+      youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ" // Replace with actual video ID
+    },
+    {
+      id: 3,
+      name: "Arjun Kumar",
+      thumbnail: "/arjun-kumar.jpg",
+      quote: "The professional approach and personalized attention made all the difference in my learning.",
+      youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ" // Replace with actual video ID
+    },
+    {
+      id: 4,
+      name: "Priya Nair",
+      thumbnail: "/priya-nair.jpg",
+      quote: "VN Academy provided the perfect foundation for my career in music composition.",
+      youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ" // Replace with actual video ID
+    }
+  ];
+
+  const openVideo = (videoUrl) => {
+    setActiveVideo(videoUrl);
+  };
+
+  const closeVideo = () => {
+    setActiveVideo(null);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -113,7 +154,7 @@ const Home = () => {
             {/* Image Section */}
             <div className="h-80 rounded-lg overflow-hidden shadow-lg">
               <img
-                src="/logo.png" 
+                src="/Batch.jpg" 
                 alt="VN Academy"
                 className="w-full h-130 object-cover"
               />
@@ -134,31 +175,29 @@ const Home = () => {
           </div>
 
           <div className="grid md:grid-cols-4 gap-6">
-            {/* Student 1 - Kiran Kamat */}
             <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
               <div className="aspect-square bg-gray-200 flex items-center justify-center">
                 <img 
-                  src="/kiran-kamat.jpg" 
-                  alt="Kiran Kamat"
+                  src="/Nithin Kamath.jpg" 
+                  alt="Nithin Kamath "
                   className="w-full h-full object-cover"
                   onError={(e) => {e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex';}}
                 />
                 <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 hidden">
-                  Kiran Kamat
+                  Nithin Kamath
                 </div>
               </div>
               <div className="p-4 text-center">
-                <h3 className="font-semibold text-gray-800">Kiran Kamat</h3>
-                <p className="text-sm text-gray-600">Music Producer</p>
+                <h3 className="font-semibold text-gray-800">Nithin Kamath </h3>
+                <p className="text-sm text-gray-600">CEO of Zerodha</p>
               </div>
             </div>
 
-            {/* Student 2 - Rajesh Sai */}
             <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
               <div className="aspect-square bg-gray-200 flex items-center justify-center">
                 <img 
-                  src="/rajesh-sai.jpg" 
-                  alt="Rajesh Sai"
+                  src="/Raghu_Dixit.jpg" 
+                  alt="Raghu Dixit"
                   className="w-full h-full object-cover"
                   onError={(e) => {e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex';}}
                 />
@@ -167,36 +206,34 @@ const Home = () => {
                 </div>
               </div>
               <div className="p-4 text-center">
-                <h3 className="font-semibold text-gray-800">Rajesh Sai</h3>
-                <p className="text-sm text-gray-600">Guitarist</p>
+                <h3 className="font-semibold text-gray-800">Raghu Dixit</h3>
+                <p className="text-sm text-gray-600">Indian Singer</p>
               </div>
             </div>
 
-            {/* Student 3 - Yash Taneja */}
             <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
               <div className="aspect-square bg-gray-200 flex items-center justify-center">
                 <img 
-                  src="/yash-taneja.jpg" 
-                  alt="Yash Taneja"
+                  src="/VSridhar.jpeg" 
+                  alt="V Sridhar"
                   className="w-full h-full object-cover"
                   onError={(e) => {e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex';}}
                 />
                 <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 hidden">
-                  Yash Taneja
+                V Sridhar
                 </div>
               </div>
               <div className="p-4 text-center">
-                <h3 className="font-semibold text-gray-800">Yash Taneja</h3>
-                <p className="text-sm text-gray-600">Film Composer</p>
+                <h3 className="font-semibold text-gray-800">V Sridhar</h3>
+                <p className="text-sm text-gray-600">Indian film score and soundtrack composer</p>
               </div>
             </div>
 
-            {/* Student 4 - Vishnu */}
             <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
               <div className="aspect-square bg-gray-200 flex items-center justify-center">
                 <img 
-                  src="/vishnu.jpg" 
-                  alt="Vishnu"
+                  src="/Ajay Singh.png" 
+                  alt="Ajay Singh"
                   className="w-full h-full object-cover"
                   onError={(e) => {e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex';}}
                 />
@@ -205,8 +242,8 @@ const Home = () => {
                 </div>
               </div>
               <div className="p-4 text-center">
-                <h3 className="font-semibold text-gray-800">Vishnu</h3>
-                <p className="text-sm text-gray-600">Music Director</p>
+                <h3 className="font-semibold text-gray-800">Ajay Singh</h3>
+                <p className="text-sm text-gray-600">Indian politician</p>
               </div>
             </div>
           </div>
@@ -217,110 +254,88 @@ const Home = () => {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{color: '#4A4947'}}>Student's Testimonials</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{color: '#4A4947'}}>
+              Student's Testimonials
+            </h2>
             <p className="text-gray-600 max-w-3xl mx-auto">
               Hear what our students have to say about their learning journey at VN Academy.
             </p>
           </div>
 
           <div className="grid md:grid-cols-4 gap-6">
-            {/* Testimonial 1 - Harshith Bhat */}
-            <div className="bg-gray-50 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
-              <div className="aspect-square bg-gray-200 flex items-center justify-center relative">
-                <img 
-                  src="/harshith-bhat.jpg" 
-                  alt="Harshith Bhat"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex';}}
-                />
-                <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 hidden">
-                  Harshith Bhat
-                </div>
-                <div className="absolute bottom-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs">
-                  LIVE
-                </div>
-              </div>
-              <div className="p-4 text-center">
-                <h3 className="font-semibold text-gray-800">Harshith Bhat</h3>
-                <p className="text-sm text-gray-600 mt-2">
-                  "The guidance and support I received at VN Academy transformed my musical journey completely."
-                </p>
-              </div>
-            </div>
+            {testimonials.map((testimonial) => (
+              <div 
+                key={testimonial.id}
+                className="bg-gray-50 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300"
+              >
+                <div 
+                  className="aspect-square bg-gray-200 flex items-center justify-center relative cursor-pointer group"
+                  onClick={() => openVideo(testimonial.youtubeUrl)}
+                >
+                  <img 
+                    src={testimonial.thumbnail}
+                    alt={testimonial.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                  <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 hidden">
+                    {testimonial.name}
+                  </div>
+                  
+                  {/* Play button overlay */}
+                  <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="bg-white rounded-full p-4 transform group-hover:scale-110 transition-transform duration-300">
+                      <Play className="w-8 h-8 text-red-600 fill-red-600" />
+                    </div>
+                  </div>
 
-            {/* Testimonial 2 - Rohan Shetty */}
-            <div className="bg-gray-50 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
-              <div className="aspect-square bg-gray-200 flex items-center justify-center relative">
-                <img 
-                  src="/rohan-shetty.jpg" 
-                  alt="Rohan Shetty"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex';}}
-                />
-                <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 hidden">
-                  Rohan Shetty
+                  {/* LIVE badge */}
+                  <div className="absolute bottom-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs">
+                    LIVE
+                  </div>
                 </div>
-                <div className="absolute bottom-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs">
-                  LIVE
+                
+                <div className="p-4 text-center">
+                  <h3 className="font-semibold text-gray-800">{testimonial.name}</h3>
+                  <p className="text-sm text-gray-600 mt-2">
+                    "{testimonial.quote}"
+                  </p>
                 </div>
               </div>
-              <div className="p-4 text-center">
-                <h3 className="font-semibold text-gray-800">Rohan Shetty</h3>
-                <p className="text-sm text-gray-600 mt-2">
-                  "Learning music production here opened doors to opportunities I never imagined."
-                </p>
-              </div>
-            </div>
-
-            {/* Testimonial 3 - Arjun Kumar */}
-            <div className="bg-gray-50 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
-              <div className="aspect-square bg-gray-200 flex items-center justify-center relative">
-                <img 
-                  src="/arjun-kumar.jpg" 
-                  alt="Arjun Kumar"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex';}}
-                />
-                <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 hidden">
-                  Arjun Kumar
-                </div>
-                <div className="absolute bottom-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs">
-                  LIVE
-                </div>
-              </div>
-              <div className="p-4 text-center">
-                <h3 className="font-semibold text-gray-800">Arjun Kumar</h3>
-                <p className="text-sm text-gray-600 mt-2">
-                  "The professional approach and personalized attention made all the difference in my learning."
-                </p>
-              </div>
-            </div>
-
-            {/* Testimonial 4 - Priya Nair */}
-            <div className="bg-gray-50 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
-              <div className="aspect-square bg-gray-200 flex items-center justify-center relative">
-                <img 
-                  src="/priya-nair.jpg" 
-                  alt="Priya Nair"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex';}}
-                />
-                <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 hidden">
-                  Priya Nair
-                </div>
-                <div className="absolute bottom-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs">
-                  LIVE
-                </div>
-              </div>
-              <div className="p-4 text-center">
-                <h3 className="font-semibold text-gray-800">Priya Nair</h3>
-                <p className="text-sm text-gray-600 mt-2">
-                  "VN Academy provided the perfect foundation for my career in music composition."
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
+
+        {/* Video Modal */}
+        {activeVideo && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
+            onClick={closeVideo}
+          >
+            <div 
+              className="relative w-full max-w-4xl aspect-video"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={closeVideo}
+                className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors"
+              >
+                <X className="w-8 h-8" />
+              </button>
+              <iframe
+                src={activeVideo}
+                title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full rounded-lg"
+              ></iframe>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* CTA Section */}
