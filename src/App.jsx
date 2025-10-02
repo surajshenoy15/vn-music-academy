@@ -1,29 +1,33 @@
 // App.jsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+// Components
 import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
-import About from "./pages/About";
-import Courses from "./pages/Courses";
-import Contact from "./pages/Contact";
 import Footer from "./components/Footer";
 import LoginPage from "./components/LoginPage";
+import Whatsapp from "./components/Whatsapp";  
+
+// Pages
+import Home from "./pages/Home";
+import About from "./pages/About";   // ✅ Added About Page
+import Courses from "./pages/Courses";
+import Contact from "./pages/Contact";
 import Register from "./pages/Register";
-import Whatsapp from "./components/Whatsapp";  // ✅ Import WhatsApp component
-import Testimonials from "./pages/Testimonials"; // ✅ Import Testimonials
-import Gallery from "./pages/Gallery"; // ✅ Import Gallery
+import Testimonials from "./pages/Testimonials";
+import Gallery from "./pages/Gallery";
 
 // Admin Layout + Pages
 import AdminDashboard from "./pages/AdminDashboard";
 import Dashboard from "./pages/Dashboard";
 import Students from "./pages/Students";
 import Attendance from "./pages/Attendance";
-import AdminPayment from "./pages/AdminPayment";  // ✅ Import AdminPayment
+import AdminPayment from "./pages/AdminPayment";
 
 // Student Layout + Pages
-import StudentDashboard from "./pages/StudentDashboard";   
-import DashboardStudent from "./pages/Dashboard-student"; 
-import StudentAttendance from "./pages/StudentAttendance"; 
-import StudentPayment from "./pages/StudentPayment"; // ✅ Import StudentPayment
+import StudentDashboard from "./pages/StudentDashboard";
+import DashboardStudent from "./pages/Dashboard-student";
+import StudentAttendance from "./pages/StudentAttendance";
+import StudentPayment from "./pages/StudentPayment";
 
 function App() {
   return (
@@ -46,7 +50,7 @@ function App() {
             element={
               <>
                 <Navbar />
-                <About />
+                <About /> {/* ✅ Renders your About.jsx page */}
                 <Footer />
               </>
             }
@@ -116,20 +120,21 @@ function App() {
           <Route path="/student" element={<StudentDashboard />}>
             <Route index element={<DashboardStudent />} /> {/* /student */}
             <Route path="student-dashboard" element={<DashboardStudent />} />
-            <Route path="attendance" element={<StudentAttendance />} /> {/* ✅ /student/attendance */}
-            <Route path="payments" element={<StudentPayment />} /> {/* ✅ /student/payments */}
+            <Route path="attendance" element={<StudentAttendance />} /> {/* /student/attendance */}
+            <Route path="payments" element={<StudentPayment />} /> {/* /student/payments */}
           </Route>
 
           {/* Admin Dashboard Routes */}
           <Route path="/admin" element={<AdminDashboard />}>
+            <Route index element={<Dashboard />} />   {/* Default page when visiting /admin */}
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="students" element={<Students />} />
             <Route path="attendance" element={<Attendance />} />
-            <Route path="payments" element={<AdminPayment />} /> {/* ✅ /admin/payments */}
+            <Route path="payments" element={<AdminPayment />} />
           </Route>
         </Routes>
 
-        {/* ✅ WhatsApp button is always available on all pages */}
+        {/* ✅ WhatsApp button is always available */}
         <Whatsapp />
       </div>
     </Router>

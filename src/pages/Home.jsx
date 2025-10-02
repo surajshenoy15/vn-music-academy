@@ -5,37 +5,6 @@ import { Link } from "react-router-dom";
 const Home = () => {
   const [activeVideo, setActiveVideo] = useState(null);
 
-  const testimonials = [
-    {
-      id: 1,
-      name: "Harshith Bhat",
-      thumbnail: "/harshith-bhat.jpg",
-      quote: "The guidance and support I received at VN Academy transformed my musical journey completely.",
-      youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ" // Replace with actual video ID
-    },
-    {
-      id: 2,
-      name: "Rohan Shetty",
-      thumbnail: "/rohan-shetty.jpg",
-      quote: "Learning music production here opened doors to opportunities I never imagined.",
-      youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ" // Replace with actual video ID
-    },
-    {
-      id: 3,
-      name: "Arjun Kumar",
-      thumbnail: "/arjun-kumar.jpg",
-      quote: "The professional approach and personalized attention made all the difference in my learning.",
-      youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ" // Replace with actual video ID
-    },
-    {
-      id: 4,
-      name: "Priya Nair",
-      thumbnail: "/priya-nair.jpg",
-      quote: "VN Academy provided the perfect foundation for my career in music composition.",
-      youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ" // Replace with actual video ID
-    }
-  ];
-
   const openVideo = (videoUrl) => {
     setActiveVideo(videoUrl);
   };
@@ -136,32 +105,37 @@ const Home = () => {
 
       {/* About Us Section */}
       <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Text Content */}
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
-                About US
-              </h2>
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                Founded in 2016 by <strong>Vishal Naidruv</strong>—a renowned composer and music producer in the Indian Film Industry—VN Academy has empowered hundreds of aspiring musicians with world-class training. From piano and guitar to music production, recording, songwriting, mixing, and mastering, the academy is dedicated to building strong foundations and guiding students to professional excellence in music.
-              </p>
-              <button className="bg-transparent border-2 border-gray-800 text-gray-800 px-6 py-2 font-medium hover:bg-gray-800 hover:text-white transition duration-300">
-                View More →
-              </button>
-            </div>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="grid lg:grid-cols-2 gap-12 items-center">
+      {/* Text Content */}
+      <div>
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
+          About US
+        </h2>
+        <p className="text-gray-600 mb-6 leading-relaxed">
+          Founded in 2016 by <strong>Vishal Naidruv</strong>—a renowned composer and music producer in the Indian Film Industry—VN Academy has empowered hundreds of aspiring musicians with world-class training. From piano and guitar to music production, recording, songwriting, mixing, and mastering, the academy is dedicated to building strong foundations and guiding students to professional excellence in music.
+        </p>
+        
+        {/* Link to About Page */}
+        <Link to="/about">
+          <button className="bg-transparent border-2 border-gray-800 text-gray-800 px-6 py-2 font-medium hover:bg-gray-800 hover:text-white transition duration-300">
+            View More →
+          </button>
+        </Link>
+      </div>
 
-            {/* Image Section */}
-            <div className="h-80 rounded-lg overflow-hidden shadow-lg">
-              <img
-                src="/Batch.jpg" 
-                alt="VN Academy"
-                className="w-full h-130 object-cover"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Image Section */}
+      <div className="h-80 rounded-lg overflow-hidden shadow-lg">
+        <img
+          src="/Batch.jpg" 
+          alt="VN Academy"
+          className="w-full h-130 object-cover"
+        />
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* Notable Students Section */}
       <section className="py-16 bg-white" style={{backgroundColor: '#4A4947'}}>
@@ -175,77 +149,27 @@ const Home = () => {
           </div>
 
           <div className="grid md:grid-cols-4 gap-6">
-            <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
-              <div className="aspect-square bg-gray-200 flex items-center justify-center">
-                <img 
-                  src="/Nithin Kamath.jpg" 
-                  alt="Nithin Kamath "
-                  className="w-full h-full object-cover"
-                  onError={(e) => {e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex';}}
-                />
-                <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 hidden">
-                  Nithin Kamath
+            {/* Student Cards */}
+            {[
+              { name: "Nithin Kamath", role: "CEO of Zerodha", image: "/Nithin Kamath.jpg" },
+              { name: "Raghu Dixit", role: "Indian Singer", image: "/Raghu_Dixit.jpg" },
+              { name: "V Sridhar", role: "Film Score Composer", image: "/VSridhar.jpeg" },
+              { name: "Ajay Singh", role: "Indian Politician", image: "/Ajay Singh.png" }
+            ].map((student, i) => (
+              <div key={i} className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
+                <div className="aspect-square bg-gray-200 flex items-center justify-center">
+                  <img 
+                    src={student.image} 
+                    alt={student.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-4 text-center">
+                  <h3 className="font-semibold text-gray-800">{student.name}</h3>
+                  <p className="text-sm text-gray-600">{student.role}</p>
                 </div>
               </div>
-              <div className="p-4 text-center">
-                <h3 className="font-semibold text-gray-800">Nithin Kamath </h3>
-                <p className="text-sm text-gray-600">CEO of Zerodha</p>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
-              <div className="aspect-square bg-gray-200 flex items-center justify-center">
-                <img 
-                  src="/Raghu_Dixit.jpg" 
-                  alt="Raghu Dixit"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex';}}
-                />
-                <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 hidden">
-                  Rajesh Sai
-                </div>
-              </div>
-              <div className="p-4 text-center">
-                <h3 className="font-semibold text-gray-800">Raghu Dixit</h3>
-                <p className="text-sm text-gray-600">Indian Singer</p>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
-              <div className="aspect-square bg-gray-200 flex items-center justify-center">
-                <img 
-                  src="/VSridhar.jpeg" 
-                  alt="V Sridhar"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex';}}
-                />
-                <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 hidden">
-                V Sridhar
-                </div>
-              </div>
-              <div className="p-4 text-center">
-                <h3 className="font-semibold text-gray-800">V Sridhar</h3>
-                <p className="text-sm text-gray-600">Indian film score and soundtrack composer</p>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
-              <div className="aspect-square bg-gray-200 flex items-center justify-center">
-                <img 
-                  src="/Ajay Singh.png" 
-                  alt="Ajay Singh"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex';}}
-                />
-                <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 hidden">
-                  Vishnu
-                </div>
-              </div>
-              <div className="p-4 text-center">
-                <h3 className="font-semibold text-gray-800">Ajay Singh</h3>
-                <p className="text-sm text-gray-600">Indian politician</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -254,7 +178,7 @@ const Home = () => {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{color: '#4A4947'}}>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#4A4947' }}>
               Student's Testimonials
             </h2>
             <p className="text-gray-600 max-w-3xl mx-auto">
@@ -263,45 +187,65 @@ const Home = () => {
           </div>
 
           <div className="grid md:grid-cols-4 gap-6">
-            {testimonials.map((testimonial) => (
-              <div 
+            {[
+              {
+                id: 2,
+                name: "Harshavardhan VS",
+                role: "Grade 8, Guitar",
+                image: "harsha.png",
+                text: "Learning guitar here has been an incredible journey. The teachers are so supportive and I've grown so much as a musician in just a few months.",
+                embedId: "jS1QY0Z0Mkg"
+              },
+              {
+                id: 3,
+                name: "Vignesh Mani",
+                role: "Singer/Songwriter",
+                image: "vignesh.png",
+                text: "From a beginner to performing my own songs, this academy has transformed my musical abilities. The personalized approach really works!",
+                embedId: "guWNNPGol1I"
+              },
+              {
+                id: 4,
+                name: "Harish P",
+                role: "Entrepreneur",
+                image: "harish.png",
+                text: "Even as a busy professional, I found time to learn music here. The flexible schedule and excellent teaching made it possible to pursue my passion.",
+                embedId: "FGhRQ7PymNU"
+              },
+              {
+                id: 5,
+                name: "Anoop Krishna",
+                role: "EDM Producer",
+                image: "anoop.png",
+                text: "The electronic music production course opened up a whole new world for me. Now I'm creating my own tracks and living my dream!",
+                embedId: "swujb8z8c20"
+              }
+            ].map((testimonial) => (
+              <div
                 key={testimonial.id}
                 className="bg-gray-50 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300"
               >
-                <div 
+                <div
                   className="aspect-square bg-gray-200 flex items-center justify-center relative cursor-pointer group"
-                  onClick={() => openVideo(testimonial.youtubeUrl)}
+                  onClick={() => openVideo(`https://www.youtube.com/embed/${testimonial.embedId}`)}
                 >
-                  <img 
-                    src={testimonial.thumbnail}
+                  <img
+                    src={testimonial.image}
                     alt={testimonial.name}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
-                    }}
                   />
-                  <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 hidden">
-                    {testimonial.name}
-                  </div>
-                  
                   {/* Play button overlay */}
                   <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="bg-white rounded-full p-4 transform group-hover:scale-110 transition-transform duration-300">
                       <Play className="w-8 h-8 text-red-600 fill-red-600" />
                     </div>
                   </div>
-
-                  {/* LIVE badge */}
-                  <div className="absolute bottom-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs">
-                    LIVE
-                  </div>
                 </div>
-                
                 <div className="p-4 text-center">
                   <h3 className="font-semibold text-gray-800">{testimonial.name}</h3>
+                  <p className="text-sm text-gray-600 mt-1 italic">{testimonial.role}</p>
                   <p className="text-sm text-gray-600 mt-2">
-                    "{testimonial.quote}"
+                    "{testimonial.text}"
                   </p>
                 </div>
               </div>
@@ -311,11 +255,11 @@ const Home = () => {
 
         {/* Video Modal */}
         {activeVideo && (
-          <div 
+          <div
             className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
             onClick={closeVideo}
           >
-            <div 
+            <div
               className="relative w-full max-w-4xl aspect-video"
               onClick={(e) => e.stopPropagation()}
             >
@@ -337,9 +281,6 @@ const Home = () => {
           </div>
         )}
       </section>
-
-      {/* CTA Section */}
-      
     </div>
   );
 };

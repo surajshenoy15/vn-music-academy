@@ -57,7 +57,7 @@ const Footer = () => {
 </a>
 
                 <a
-                  href="mailto:kkshetty@ashainfracore.com"
+                  href="mailto:Vnmusicacademy.official@gmail.com"
                   className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
                 >
                   <img
@@ -67,13 +67,13 @@ const Footer = () => {
                   />
                 </a>
                 <a
-                  href="https://www.facebook.com/p/ASHA-Infracore-100066623525874/"
+                  href="https://www.instagram.com/vnmusicacademy/?igsh=MTN1cmlsaXEzbXU4dg%3D%3D&utm_source=qr"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
                 >
                   <img
-                    src="/Facebook 1.png"
+                    src="/Instagram_1.png"
                     alt="Facebook"
                     className="w-6 h-6 object-contain"
                   />
@@ -94,15 +94,11 @@ const Footer = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/about-us" className="hover:text-gray-200 transition-colors">
+                  <Link to="/about" className="hover:text-gray-200 transition-colors">
                     About Us
                   </Link>
                 </li>
-                <li>
-                  <Link to="/services" className="hover:text-gray-200 transition-colors">
-                    Services
-                  </Link>
-                </li>
+               
                 <li>
                   <Link to="/contact" className="hover:text-gray-200 transition-colors">
                     Contact Us
@@ -118,17 +114,17 @@ const Footer = () => {
               </h3>
               <ul className="space-y-1 text-sm">
                 <li>
-                  <Link to="/courses" className="hover:text-gray-200 transition-colors">
+                  <Link to="/guitar-classes" className="hover:text-gray-200 transition-colors">
                     Guitar Classes
                   </Link>
                 </li>
                 <li>
-                  <Link to="/courses" className="hover:text-gray-200 transition-colors">
+                  <Link to="/piano-classes" className="hover:text-gray-200 transition-colors">
                     Piano/Keyboard
                   </Link>
                 </li>
                 <li>
-                  <Link to="/courses" className="hover:text-gray-200 transition-colors">
+                  <Link to="/music-production" className="hover:text-gray-200 transition-colors">
                     Music Production
                   </Link>
                 </li>
