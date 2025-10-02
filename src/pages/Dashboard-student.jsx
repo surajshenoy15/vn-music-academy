@@ -15,7 +15,7 @@ export default function DashboardStudent() {
   const [error, setError] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 20;
   const [editForm, setEditForm] = useState({
     name: "",
     email: "",
@@ -700,7 +700,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
           <div className="flex items-center gap-3 mb-4">
             <MessageSquare className="text-[#4A4947]" size={24} />
-            <h3 className="text-xl font-bold text-[#4A4947]">Feedback from Admin</h3>
+            <h3 className="text-xl font-bold text-[#4A4947]">Feedback</h3>
           </div>
           
           {feedback ? (

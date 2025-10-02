@@ -28,7 +28,7 @@ const StudentAttendance = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 20;
   const [stats, setStats] = useState({
     total: 0,
     present: 0,
