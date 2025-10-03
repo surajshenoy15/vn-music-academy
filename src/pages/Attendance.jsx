@@ -267,28 +267,48 @@ const createSession = async () => {
   };
 
   // Export to PDF using jsPDF
-  const exportToPDF = () => {
-    const doc = new jsPDF();
-    const filteredData = getFilteredAttendance();
+const exportToPDF = () => {
+  const doc = new jsPDF();
+  const filteredData = getFilteredAttendance();
 
-    doc.text("Attendance Report - Present Students", 14, 15);
+  // Set title with custom color
+  doc.setTextColor(74, 73, 71); // #4A4947
+  doc.setFontSize(16);
+  doc.text("Attendance Report - Present Students", 14, 15);
 
-    const tableColumn = ["Student Name", "Date", "Time", "Session"];
-    const tableRows = filteredData.map(record => [
-      record.students?.name || "Unknown",
-      record.date,
-      record.timing,
-      record.session_name || "N/A"
-    ]);
+  const tableColumn = ["S.No.", "Student Name", "Date", "Time", "Session"];
+  const tableRows = filteredData.map((record, index) => [
+    (index + 1).toString(), // Serial number
+    record.students?.name || "Unknown",
+    record.date,
+    record.timing,
+    record.session_name || "N/A"
+  ]);
 
-    autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 25,
-    });
+  autoTable(doc, {
+    head: [tableColumn],
+    body: tableRows,
+    startY: 25,
+    headStyles: {
+      fillColor: [74, 73, 71], // #4A4947
+      textColor: [255, 255, 255], // White
+      fontStyle: 'bold',
+      halign: 'left'
+    },
+    bodyStyles: {
+      textColor: [74, 73, 71], // #4A4947
+    },
+    alternateRowStyles: {
+      fillColor: [245, 245, 245] // Light gray for alternate rows
+    },
+    columnStyles: {
+      0: { cellWidth: 20 }, // S.No column width
+      1: { cellWidth: 50 }, // Student Name column width
+    }
+  });
 
-    doc.save(`attendance_present_${filterType}_${new Date().toISOString().split("T")[0]}.pdf`);
-  };
+  doc.save(`attendance_present_${filterType}_${new Date().toISOString().split("T")[0]}.pdf`);
+};
 
   // Get attendance statistics (only present students)
   const getAttendanceStats = () => {
