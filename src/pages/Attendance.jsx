@@ -74,34 +74,40 @@ const ITEMS_PER_PAGE = 20;
   // Create new session (with or without students)
 const createSession = async () => {
   try {
-    const sessionName = sessionTopic.trim() || null; // Make optional
+    const sessionName = sessionTopic.trim() || null;
 
-    if (selectedStudentsForSession.size === 0) {
-      // Create session with no students
-      const { error } = await supabase
-        .from('attendance')
-        .insert([{
+    const attendanceRecords = selectedStudentsForSession.size > 0
+      ? Array.from(selectedStudentsForSession).map(studentId => ({
+          student_id: studentId,
+          date: selectedDate,
+          timing: selectedTiming,
+          status: 'present',
+          session_name: sessionName
+        }))
+      : [{
           student_id: null,
           date: selectedDate,
           timing: selectedTiming,
           status: 'present',
           session_name: sessionName
-        }]);
-      if (error) throw error;
-    } else {
-      // Create attendance records for selected students
-      const attendanceRecords = Array.from(selectedStudentsForSession).map(studentId => ({
-        student_id: studentId,
-        date: selectedDate,
-        timing: selectedTiming,
-        status: 'present',
-        session_name: sessionName
-      }));
+        }];
 
-      const { error } = await supabase
-        .from('attendance')
-        .insert(attendanceRecords);
-      if (error) throw error;
+    for (const record of attendanceRecords) {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/attendance/mark`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(record),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        console.error('Error marking attendance:', data.error);
+        alert('Error marking attendance: ' + data.error);
+      } else {
+        console.log('Attendance marked:', data);
+      }
     }
 
     setShowCreateSession(false);
@@ -114,6 +120,7 @@ const createSession = async () => {
     alert('Error creating session. Please try again.');
   }
 };
+
 
 
   // Add student to existing session
