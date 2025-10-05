@@ -30,7 +30,9 @@ const Attendance = () => {
   const [modalSearchTerm, setModalSearchTerm] = useState('');
   const [sessionsCurrentPage, setSessionsCurrentPage] = useState(1);
 const [attendanceCurrentPage, setAttendanceCurrentPage] = useState(1);
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 10;
+const [editingSession, setEditingSession] = useState(null);
+const [editSessionName, setEditSessionName] = useState('');
 
   // Fetch students from Supabase
   const fetchStudents = async () => {
@@ -316,7 +318,7 @@ const exportToPDF = () => {
     const totalRecords = filteredData.length;
     const uniqueDates = [...new Set(filteredData.map(record => `${record.date}-${record.timing}`))].length;
     const avgStudentsPerSession = uniqueDates > 0 ? (totalRecords / uniqueDates).toFixed(1) : 0;
-    const uniqueSessions = [...new Set(filteredData.map(record => record.session_name || 'Unnamed'))].length;
+    const uniqueSessions = [...new Set(filteredData.map(record => record.session_name || ''))].length;
 
     return { 
       totalRecords, 
@@ -349,6 +351,25 @@ const exportToPDF = () => {
     
     return Object.values(sessions).sort((a, b) => new Date(b.date) - new Date(a.date));
   };
+  // Update session name
+const updateSessionName = async (date, timing, oldSessionName) => {
+  try {
+    const { error } = await supabase
+      .from('attendance')
+      .update({ session_name: editSessionName })
+      .eq('date', date)
+      .eq('timing', timing)
+      .eq('session_name', oldSessionName);
+    
+    if (error) throw error;
+    setEditingSession(null);
+    setEditSessionName('');
+    fetchAttendance();
+  } catch (error) {
+    console.error('Error updating session name:', error);
+    alert('Error updating session name. Please try again.');
+  }
+};
 
   useEffect(() => {
     const loadData = async () => {
@@ -683,14 +704,44 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     
     return (
       <tr key={`${session.date}-${session.timing}`} className="hover:bg-gray-50">
-        {/* Serial Number + Session Name in two lines */}
+        {/* Serial Number + Session Name with inline editing */}
         <td className="px-6 py-4 whitespace-nowrap">
           <div className="text-xs text-gray-500">
-            {totalSessions - globalIndex} {/* Serial number in smaller gray text */}
+            {totalSessions - globalIndex}
           </div>
-          <div className="text-sm text-gray-900 font-medium">
-            {session.session_name || ''} {/* Session name in bold */}
-          </div>
+          {editingSession === `${session.date}-${session.timing}` ? (
+            <div className="flex items-center gap-2 mt-1">
+              <input
+                type="text"
+                value={editSessionName}
+                onChange={(e) => setEditSessionName(e.target.value)}
+                className="text-sm px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                placeholder="Session name..."
+                autoFocus
+              />
+              <button
+                onClick={() => updateSessionName(session.date, session.timing, session.session_name)}
+                className="p-1 rounded bg-green-100 text-green-600 hover:bg-green-200"
+                title="Save"
+              >
+                <Check size={14} />
+              </button>
+              <button
+                onClick={() => {
+                  setEditingSession(null);
+                  setEditSessionName('');
+                }}
+                className="p-1 rounded bg-gray-100 text-gray-600 hover:bg-gray-200"
+                title="Cancel"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          ) : (
+            <div className="text-sm text-gray-900 font-medium mt-1">
+              {session.session_name || ''}
+            </div>
+          )}
         </td>
 
         {/* Date & Time */}
@@ -703,46 +754,83 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
           </div>
         </td>
 
-        {/* Students Present */}
-        <td className="px-6 py-4 whitespace-nowrap">
-          <div className="flex items-center">
-            <span className="text-sm font-medium text-gray-900 mr-2">
-              {session.students.length}
-            </span>
-            <div className="flex -space-x-1">
-              {session.students.slice(0, 3).map((student) => (
-                <div
-                  key={student.id}
-                  className="h-6 w-6 rounded-full bg-green-100 border border-white flex items-center justify-center"
-                  title={student.students?.name}
+        {/* Students Present - Expandable List */}
+        <td className="px-6 py-4">
+          <div className="space-y-2">
+            {session.students.slice(0, 3).map((student) => (
+              <div key={student.id} className="flex items-center justify-between group">
+                <div className="flex items-center">
+                  <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center mr-2">
+                    <span className="text-xs font-medium text-green-700">
+                      {student.students?.name?.charAt(0) || '?'}
+                    </span>
+                  </div>
+                  <span className="text-sm text-gray-900">{student.students?.name}</span>
+                </div>
+                <button
+                  onClick={() => removeAttendanceRecord(student.id)}
+                  className="opacity-0 group-hover:opacity-100 p-1 rounded bg-red-100 text-red-600 hover:bg-red-200 transition-all"
+                  title="Remove student"
                 >
-                  <span className="text-xs font-medium text-green-700">
-                    {student.students?.name?.charAt(0) || '?'}
-                  </span>
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            ))}
+            {session.students.length > 3 && (
+              <details className="text-sm">
+                <summary className="cursor-pointer text-blue-600 hover:text-blue-800">
+                  Show {session.students.length - 3} more...
+                </summary>
+                <div className="space-y-2 mt-2">
+                  {session.students.slice(3).map((student) => (
+                    <div key={student.id} className="flex items-center justify-between group">
+                      <div className="flex items-center">
+                        <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center mr-2">
+                          <span className="text-xs font-medium text-green-700">
+                            {student.students?.name?.charAt(0) || '?'}
+                          </span>
+                        </div>
+                        <span className="text-sm text-gray-900">{student.students?.name}</span>
+                      </div>
+                      <button
+                        onClick={() => removeAttendanceRecord(student.id)}
+                        className="opacity-0 group-hover:opacity-100 p-1 rounded bg-red-100 text-red-600 hover:bg-red-200 transition-all"
+                        title="Remove student"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              ))}
-              {session.students.length > 3 && (
-                <div className="h-6 w-6 rounded-full bg-gray-100 border border-white flex items-center justify-center">
-                  <span className="text-xs font-medium text-gray-700">
-                    +{session.students.length - 3}
-                  </span>
-                </div>
-              )}
-            </div>
+              </details>
+            )}
+            {session.students.length === 0 && (
+              <span className="text-sm text-gray-500">No students</span>
+            )}
           </div>
         </td>
 
         {/* Actions */}
         <td className="px-6 py-4 whitespace-nowrap">
-          <button
-            onClick={() =>
-              addStudentToSession(session.date, session.timing, session.session_name)
-            }
-            className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
-            title="Add student to session"
-          >
-            <Plus size={16} />
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => addStudentToSession(session.date, session.timing, session.session_name)}
+              className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
+              title="Add student to session"
+            >
+              <Plus size={16} />
+            </button>
+            <button
+              onClick={() => {
+                setEditingSession(`${session.date}-${session.timing}`);
+                setEditSessionName(session.session_name || '');
+              }}
+              className="p-2 rounded-lg bg-purple-100 text-purple-600 hover:bg-purple-200 transition-colors"
+              title="Edit session name"
+            >
+              <Edit size={16} />
+            </button>
+          </div>
         </td>
       </tr>
     );
@@ -774,121 +862,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
           </div>
         </div>
 
-        {/* Attendance Table */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Present Students ({filteredAttendance.length})
-            </h3>
-          </div>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <tr>
-  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-    S.No.
-  </th>
-  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-    Student
-  </th>
-  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-    Session Name
-  </th>
-  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-    Date
-  </th>
-  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-    Timing
-  </th>
-  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-    Actions
-  </th>
-</tr>
-
-            <tbody className="bg-white divide-y divide-gray-200">
-  {getPaginatedAttendance().map((record, index) => {
-    const globalIndex = (attendanceCurrentPage - 1) * ITEMS_PER_PAGE + index;
     
-    return (
-      <tr key={record.id} className="hover:bg-gray-50">
-        {/* Serial Number */}
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-          {globalIndex + 1}
-        </td>
-
-        {/* Student Info */}
-        <td className="px-6 py-4 whitespace-nowrap">
-          <div className="flex items-center">
-            <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-              <span className="text-sm font-medium text-green-700">
-                {record.students?.name?.charAt(0) || '?'}
-              </span>
-            </div>
-            <div className="ml-4">
-              <div className="text-sm font-medium text-gray-900">
-                {record.students?.name || 'Unknown'}
-              </div>
-              <div className="text-sm text-gray-500">
-                {record.students?.email || ''}
-              </div>
-            </div>
-          </div>
-        </td>
-
-        {/* Session Name */}
-        <td className="px-6 py-4 whitespace-nowrap">
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-            {record.session_name || ''}
-          </span>
-        </td>
-
-        {/* Date */}
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-          {new Date(record.date).toLocaleDateString()}
-        </td>
-
-        {/* Timing */}
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-          {record.timing}
-        </td>
-
-        {/* Actions */}
-        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-          <button
-            onClick={() => removeAttendanceRecord(record.id)}
-            className="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
-            title="Remove from session"
-          >
-            <Trash2 size={16} />
-          </button>
-        </td>
-      </tr>
-    );
-  })}
-</tbody>
-
-            </table>
-
-            {filteredAttendance.length > ITEMS_PER_PAGE && (
-  <Pagination 
-    currentPage={attendanceCurrentPage}
-    totalPages={attendanceTotalPages}
-    onPageChange={setAttendanceCurrentPage}
-  />
-)}
-
-{filteredAttendance.length === 0 && (
-  <div className="text-center py-12">
-    <Users className="mx-auto h-12 w-12 text-gray-400" />
-    <h3 className="mt-2 text-sm font-medium text-gray-900">No students present</h3>
-    <p className="mt-1 text-sm text-gray-500">
-      No students were present for the selected filters.
-    </p>
-  </div>
-)}
-            
-          </div>
-        </div>
 
         {/* Create Session Modal */}
         {showCreateSession && (
