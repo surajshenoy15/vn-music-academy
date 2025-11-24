@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Block admin & student dashboard from indexing
+Disallow: /admin/
+Disallow: /student/
+
+# Sitemap location
+Sitemap: https://vnmusicacademy.com/sitemap.xml
