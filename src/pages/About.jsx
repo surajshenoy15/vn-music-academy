@@ -15,7 +15,7 @@ const AboutUs = () => {
         <div className="relative max-w-7xl mx-auto text-center py-28 px-6">
           <div className="inline-flex items-center gap-2 mb-6 px-5 py-2 bg-white/10 backdrop-blur-md rounded-full text-sm font-medium border border-white/20">
             <span className="w-2 h-2 bg-white rounded-full"></span>
-            <span>Established 1974</span>
+            <span>Established 2016</span>
           </div>
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-light mb-6 tracking-tight leading-tight">
             About <span className="font-semibold">VN Music Academy</span>
@@ -39,7 +39,7 @@ const AboutUs = () => {
               </h2>
             </div>
             <p className="text-lg text-gray-600 leading-relaxed text-center max-w-4xl mx-auto">
-              To pursue, qualify and manifest musician by offering personalized, holistic music education that fosters not just technical excellence, but also personal, creative, and professional growth. We are committed to building well-rounded artists who can perform impactful musicianship rooted in their own goals and aspirations.
+              Empowering musicians, performers, andproducers with expertise, future-ready techskills, and creative and financial success in theevolving music industry.
             </p>
           </div>
         </div>
@@ -71,10 +71,20 @@ const AboutUs = () => {
               </h2>
               <div className="w-16 h-0.5 bg-[#4A4947]"></div>
               <p className="text-gray-600 leading-relaxed text-base">
-                Founded in 1974 by Vishal Naidruv, an acclaimed musician and music producer in the industry, VN Music Academy has been a beacon of musical excellence for over 4 decades.
+                Founded in 2016 by Vishal Naidruv, a composerand music producer in the Indian Film Industry,VN Academy has taught hundreds of studentsskills in music, including piano, guitar, musicproduction, recording, songwriting, mixing, andmastering.
               </p>
               <p className="text-gray-600 leading-relaxed text-base">
-                We offer courses not just limited to classical and folk music, but also piano, guitar, violin, production, recording, composing, and even Music Technology. We are skilled at nurturing top talent and preparing them for successful careers in the music industry.
+                10+ Years of Experience:
+Shaping the next generation of musicians with passion, precision, and a deep understanding of the art.
+
+100+ Students Trained:
+Guiding learners of all ages and skill levels, helping them achieve their musical ambitions with confidence.
+
+Career-Building Mentorship:
+More than 10 students have transformed into full-time music professionals under our mentorship.
+
+Learn from Vishal Naidruv:
+A dedicated Music Producer & Composer committed to helping students grow in today's rapidly evolving music landscape. Gain exclusive access to his studio, production workflow, and post-production techniques.
               </p>
               <div className="grid grid-cols-3 gap-6 pt-6">
                 <div>
@@ -155,11 +165,20 @@ const AboutUs = () => {
                 </div>
                 <div className="w-16 h-0.5 bg-[#4A4947]"></div>
                 <p className="text-gray-600 leading-relaxed">
-                  Vishal Naidruv is a Music Composer, Producer, Programmer, Arranger, Mixing and Mastering Engineer with a decade of experience in the music industry. With a career marked by creativity and innovation, he has established himself as a prominent figure in the music community.
+                  Founder - Vishal Naidruv
+Award-winning Music Composer/Producer, Programmer, Singer &
+Sound Engineer with 20+ years of experience.
+Worked on various Films with teams of esteemed composers -
+Anirudh Ravichander, Nakul Abhyankar, Arjun Janya etc.
+Highest grade - Grade 8 - Trinity College London - World’s most
+renowned Music Institution
+2022 - Feature film - Physics Teacher - (complete background score
+and composition), official selection, Bangalore International Film
+Festival.
                 </p>
-                <p className="text-gray-600 leading-relaxed">
-                  He founded VN Music Academy to share his expertise with the next generation of musicians. Notable achievements include collaborating with Grammy-nominated artists and producing award-winning albums. His unique approach to music education has nurtured countless talents. Under his guidance, the Academy continues to set new standards in music education, reflected by the Evergreen Experimental Band.
-                </p>
+                {/* <p className="text-gray-600 leading-relaxed"> */}
+                  {/* He founded VN Music Academy to share his expertise with the next generation of musicians. Notable achievements include collaborating with Grammy-nominated artists and producing award-winning albums. His unique approach to music education has nurtured countless talents. Under his guidance, the Academy continues to set new standards in music education, reflected by the Evergreen Experimental Band. */}
+                {/* </p> */}
               </div>
             </div>
           </div>
