@@ -74,17 +74,7 @@ const AboutUs = () => {
                 Founded in 2016 by Vishal Naidruv, a composerand music producer in the Indian Film Industry,VN Academy has taught hundreds of studentsskills in music, including piano, guitar, musicproduction, recording, songwriting, mixing, andmastering.
               </p>
               <p className="text-gray-600 leading-relaxed text-base">
-                10+ Years of Experience:
-Shaping the next generation of musicians with passion, precision, and a deep understanding of the art.
-
-100+ Students Trained:
-Guiding learners of all ages and skill levels, helping them achieve their musical ambitions with confidence.
-
-Career-Building Mentorship:
-More than 10 students have transformed into full-time music professionals under our mentorship.
-
-Learn from Vishal Naidruv:
-A dedicated Music Producer & Composer committed to helping students grow in today's rapidly evolving music landscape. Gain exclusive access to his studio, production workflow, and post-production techniques.
+               With 10+ years of experience, we’ve shaped the next generation of musicians through passionate, precise, and deeply informed training, guiding over 100 students of all ages toward their musical goals. Our career-focused mentorship has helped more than 10 learners become full-time music professionals. Under the guidance of Vishal Naidruv,an experienced Music Producer & Composer—students gain exclusive access to his studio, production workflow, and post-production techniques, empowering them to grow in today’s evolving music industry.
               </p>
               <div className="grid grid-cols-3 gap-6 pt-6">
                 <div>
