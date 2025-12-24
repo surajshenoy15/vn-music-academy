@@ -462,100 +462,57 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-
-        {/* Students Table Section */}
-        <div className="bg-white rounded-2xl shadow-md border border-gray-100">
-          <div className="p-4 sm:p-6 border-b border-gray-100">
-            <h3 className="text-lg font-semibold" style={{color: '#4A4947'}}>
-              Current Students ({students.length})
+        
+        {/* Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white rounded-2xl shadow-md p-4 sm:p-6 border border-gray-100">
+            <h3 className="text-lg font-semibold mb-4" style={{color: '#4A4947'}}>
+              Recent Activity
             </h3>
+            <ul className="space-y-3 text-sm">
+              {notifications.map((notif) => (
+                <li key={notif.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                  <div className={`p-1 rounded-full flex-shrink-0 ${
+                    notif.type === 'success' ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
+                  }`}>
+                    {notif.type === 'success' ? <Check size={12} /> : <Bell size={12} />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p style={{color: '#4A4947'}}>{notif.message}</p>
+                    <p className="text-gray-500 text-xs mt-1">{notif.time}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-100">
-                  <th className="text-left p-4 font-medium text-gray-600">Name</th>
-                  <th className="text-left p-4 font-medium text-gray-600 hidden sm:table-cell">Email</th>
-                  <th className="text-left p-4 font-medium text-gray-600 hidden md:table-cell">Phone</th>
-                  <th className="text-left p-4 font-medium text-gray-600">Course</th>
-                  <th className="text-left p-4 font-medium text-gray-600 hidden lg:table-cell">Fee Paid</th>
-                  <th className="text-left p-4 font-medium text-gray-600">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan="6" className="p-8 text-center text-gray-500">
-                      <div className="flex items-center justify-center gap-2">
-                        <RefreshCw size={20} className="animate-spin" />
-                        Loading students data...
-                      </div>
-                    </td>
-                  </tr>
-                ) : students.length === 0 ? (
-                  <tr>
-                    <td colSpan="6" className="p-8 text-center text-gray-500">
-                      <div className="flex items-center justify-center gap-2">
-                        <Database size={20} />
-                        No students found
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  students.map((student) => (
-                    <tr key={student.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                      <td className="p-4">
-                        <div>
-                          <div className="font-medium" style={{color: '#4A4947'}}>
-                            {student.name}
-                          </div>
-                          <div className="text-sm text-gray-500 sm:hidden flex items-center gap-1">
-                            <Mail size={12} />
-                            {student.email}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4 hidden sm:table-cell">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Mail size={16} />
-                          {student.email}
-                        </div>
-                      </td>
-                      <td className="p-4 hidden md:table-cell">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Phone size={16} />
-                          {student.phone || 'N/A'}
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <span className="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800">
-                          {student.course}
-                        </span>
-                      </td>
-                      <td className="p-4 hidden lg:table-cell">
-                        <span className="font-medium text-green-600">
-                          ₹{(student.fee_paid || 0).toLocaleString()}
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        <span className={`px-3 py-1 text-sm rounded-full ${
-                          student.status === 'active' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {student.status || 'active'}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+
+          <div className="bg-white rounded-2xl shadow-md p-4 sm:p-6 border border-gray-100">
+            <h3 className="text-lg font-semibold mb-4" style={{color: '#4A4947'}}>
+              Quick Stats
+            </h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Pending Applications</span>
+                <span className="font-semibold text-yellow-600">
+                  {applications.filter(app => app.status === 'pending').length}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Approved Applications</span>
+                <span className="font-semibold text-green-600">
+                  {applications.filter(app => app.status === 'approved').length}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Rejected Applications</span>
+                <span className="font-semibold text-red-600">
+                  {applications.filter(app => app.status === 'rejected').length}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Student Applications */}
+         {/* Student Applications */}
         <div className="bg-white rounded-2xl shadow-md border border-gray-100">
           <div className="p-4 sm:p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h3 className="text-lg font-semibold" style={{color: '#4A4947'}}>
@@ -665,55 +622,100 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-2xl shadow-md p-4 sm:p-6 border border-gray-100">
-            <h3 className="text-lg font-semibold mb-4" style={{color: '#4A4947'}}>
-              Recent Activity
+        {/* Students Table Section */}
+        <div className="bg-white rounded-2xl shadow-md border border-gray-100">
+          <div className="p-4 sm:p-6 border-b border-gray-100">
+            <h3 className="text-lg font-semibold" style={{color: '#4A4947'}}>
+              Current Students ({students.length})
             </h3>
-            <ul className="space-y-3 text-sm">
-              {notifications.map((notif) => (
-                <li key={notif.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                  <div className={`p-1 rounded-full flex-shrink-0 ${
-                    notif.type === 'success' ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
-                  }`}>
-                    {notif.type === 'success' ? <Check size={12} /> : <Bell size={12} />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p style={{color: '#4A4947'}}>{notif.message}</p>
-                    <p className="text-gray-500 text-xs mt-1">{notif.time}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
           </div>
-
-          <div className="bg-white rounded-2xl shadow-md p-4 sm:p-6 border border-gray-100">
-            <h3 className="text-lg font-semibold mb-4" style={{color: '#4A4947'}}>
-              Quick Stats
-            </h3>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Pending Applications</span>
-                <span className="font-semibold text-yellow-600">
-                  {applications.filter(app => app.status === 'pending').length}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Approved Applications</span>
-                <span className="font-semibold text-green-600">
-                  {applications.filter(app => app.status === 'approved').length}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Rejected Applications</span>
-                <span className="font-semibold text-red-600">
-                  {applications.filter(app => app.status === 'rejected').length}
-                </span>
-              </div>
-            </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="text-left p-4 font-medium text-gray-600">Name</th>
+                  <th className="text-left p-4 font-medium text-gray-600 hidden sm:table-cell">Email</th>
+                  <th className="text-left p-4 font-medium text-gray-600 hidden md:table-cell">Phone</th>
+                  <th className="text-left p-4 font-medium text-gray-600">Course</th>
+                  <th className="text-left p-4 font-medium text-gray-600 hidden lg:table-cell">Fee Paid</th>
+                  <th className="text-left p-4 font-medium text-gray-600">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan="6" className="p-8 text-center text-gray-500">
+                      <div className="flex items-center justify-center gap-2">
+                        <RefreshCw size={20} className="animate-spin" />
+                        Loading students data...
+                      </div>
+                    </td>
+                  </tr>
+                ) : students.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="p-8 text-center text-gray-500">
+                      <div className="flex items-center justify-center gap-2">
+                        <Database size={20} />
+                        No students found
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  students.map((student) => (
+                    <tr key={student.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                      <td className="p-4">
+                        <div>
+                          <div className="font-medium" style={{color: '#4A4947'}}>
+                            {student.name}
+                          </div>
+                          <div className="text-sm text-gray-500 sm:hidden flex items-center gap-1">
+                            <Mail size={12} />
+                            {student.email}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-4 hidden sm:table-cell">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Mail size={16} />
+                          {student.email}
+                        </div>
+                      </td>
+                      <td className="p-4 hidden md:table-cell">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Phone size={16} />
+                          {student.phone || 'N/A'}
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <span className="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800">
+                          {student.course}
+                        </span>
+                      </td>
+                      <td className="p-4 hidden lg:table-cell">
+                        <span className="font-medium text-green-600">
+                          ₹{(student.fee_paid || 0).toLocaleString()}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <span className={`px-3 py-1 text-sm rounded-full ${
+                          student.status === 'active' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {student.status || 'active'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
+
+       
+
       </div>
 
       {/* Toast Notifications */}
