@@ -141,6 +141,7 @@ const ApplicationModal = ({ application, isOpen, onClose, onSave }) => {
 export default function Dashboard() {
   const [students, setStudents] = useState([]);
   const [applications, setApplications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [loading, setLoading] = useState(true);
   const [applicationsLoading, setApplicationsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -392,16 +393,65 @@ export default function Dashboard() {
           <h1 className="text-2xl sm:text-3xl font-bold" style={{color: '#4A4947'}}>
             Admin Dashboard
           </h1>
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <Bell size={24} style={{color: '#4A4947'}} className="cursor-pointer" />
-              {notifications.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {notifications.length}
-                </span>
-              )}
+         <div className="flex items-center gap-3">
+  <div className="relative">
+    {/* Bell Button */}
+    <button
+      onClick={() => setShowNotifications(!showNotifications)}
+      className="relative p-2 rounded-full hover:bg-gray-100 transition"
+    >
+      <Bell size={24} style={{ color: '#4A4947' }} />
+
+      {notifications.length > 0 && (
+        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+          {notifications.length > 9 ? '9+' : notifications.length}
+        </span>
+      )}
+    </button>
+
+    {/* Dropdown */}
+    {showNotifications && (
+      <div className="absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-xl border border-gray-200 z-50">
+        
+        {/* Header */}
+        <div className="p-4 border-b flex items-center justify-between">
+          <h3 className="font-semibold text-gray-800">Notifications</h3>
+          <button onClick={() => setShowNotifications(false)}>
+            <X className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="max-h-72 overflow-y-auto">
+          {notifications.length > 0 ? (
+            notifications.map((n) => (
+              <div
+                key={n.id}
+                className="px-4 py-3 border-b hover:bg-gray-50"
+              >
+                <p className="text-sm font-medium text-gray-800">
+                  {n.title}
+                </p>
+                <p className="text-sm text-gray-600 mt-1">
+                  {n.message}
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  {n.time}
+                </p>
+              </div>
+            ))
+          ) : (
+            <div className="p-6 text-center">
+              <Bell className="h-10 w-10 text-gray-300 mx-auto mb-2" />
+              <p className="text-sm text-gray-500">No notifications</p>
             </div>
-          </div>
+          )}
+        </div>
+      </div>
+    )}
+  </div>
+</div>
+
         </div>
 
         {/* Stats Cards */}
