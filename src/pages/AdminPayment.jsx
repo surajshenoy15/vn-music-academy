@@ -81,7 +81,7 @@ function AdminPayment() {
 
 const handlePayment = async (student, amount) => {
   try {
-    const res = await fetch("https://vn-music-academy.onrender.com/api/payment/create-order", {
+    const res = await fetch("https://vn-music-academy-backend.onrender.com/api/payment/create-order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ amount }), // pass actual pending amount
@@ -103,7 +103,7 @@ const handlePayment = async (student, amount) => {
       description: "Payment for Course",
       order_id: order.id,
       handler: async function (response) {
-        const verifyRes = await fetch("https://vn-music-academy.onrender.com/api/payment/verify-payment", {
+        const verifyRes = await fetch("https://vn-music-academy-backend.onrender.com/api/payment/verify-payment", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(response),

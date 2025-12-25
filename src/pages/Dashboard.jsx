@@ -141,7 +141,6 @@ const ApplicationModal = ({ application, isOpen, onClose, onSave }) => {
 export default function Dashboard() {
   const [students, setStudents] = useState([]);
   const [applications, setApplications] = useState([]);
-  const [showNotifications, setShowNotifications] = useState(false);
   const [loading, setLoading] = useState(true);
   const [applicationsLoading, setApplicationsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -393,65 +392,16 @@ export default function Dashboard() {
           <h1 className="text-2xl sm:text-3xl font-bold" style={{color: '#4A4947'}}>
             Admin Dashboard
           </h1>
-         <div className="flex items-center gap-3">
-  <div className="relative">
-    {/* Bell Button */}
-    <button
-      onClick={() => setShowNotifications(!showNotifications)}
-      className="relative p-2 rounded-full hover:bg-gray-100 transition"
-    >
-      <Bell size={24} style={{ color: '#4A4947' }} />
-
-      {notifications.length > 0 && (
-        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
-          {notifications.length > 9 ? '9+' : notifications.length}
-        </span>
-      )}
-    </button>
-
-    {/* Dropdown */}
-    {showNotifications && (
-      <div className="absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-xl border border-gray-200 z-50">
-        
-        {/* Header */}
-        <div className="p-4 border-b flex items-center justify-between">
-          <h3 className="font-semibold text-gray-800">Notifications</h3>
-          <button onClick={() => setShowNotifications(false)}>
-            <X className="h-4 w-4 text-gray-400 hover:text-gray-600" />
-          </button>
-        </div>
-
-        {/* Body */}
-        <div className="max-h-72 overflow-y-auto">
-          {notifications.length > 0 ? (
-            notifications.map((n) => (
-              <div
-                key={n.id}
-                className="px-4 py-3 border-b hover:bg-gray-50"
-              >
-                <p className="text-sm font-medium text-gray-800">
-                  {n.title}
-                </p>
-                <p className="text-sm text-gray-600 mt-1">
-                  {n.message}
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  {n.time}
-                </p>
-              </div>
-            ))
-          ) : (
-            <div className="p-6 text-center">
-              <Bell className="h-10 w-10 text-gray-300 mx-auto mb-2" />
-              <p className="text-sm text-gray-500">No notifications</p>
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Bell size={24} style={{color: '#4A4947'}} className="cursor-pointer" />
+              {notifications.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {notifications.length}
+                </span>
+              )}
             </div>
-          )}
-        </div>
-      </div>
-    )}
-  </div>
-</div>
-
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -562,7 +512,100 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-         {/* Student Applications */}
+
+        {/* Students Table Section */}
+        <div className="bg-white rounded-2xl shadow-md border border-gray-100">
+          <div className="p-4 sm:p-6 border-b border-gray-100">
+            <h3 className="text-lg font-semibold" style={{color: '#4A4947'}}>
+              Current Students ({students.length})
+            </h3>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="text-left p-4 font-medium text-gray-600">Name</th>
+                  <th className="text-left p-4 font-medium text-gray-600 hidden sm:table-cell">Email</th>
+                  <th className="text-left p-4 font-medium text-gray-600 hidden md:table-cell">Phone</th>
+                  <th className="text-left p-4 font-medium text-gray-600">Course</th>
+                  <th className="text-left p-4 font-medium text-gray-600 hidden lg:table-cell">Fee Paid</th>
+                  <th className="text-left p-4 font-medium text-gray-600">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan="6" className="p-8 text-center text-gray-500">
+                      <div className="flex items-center justify-center gap-2">
+                        <RefreshCw size={20} className="animate-spin" />
+                        Loading students data...
+                      </div>
+                    </td>
+                  </tr>
+                ) : students.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="p-8 text-center text-gray-500">
+                      <div className="flex items-center justify-center gap-2">
+                        <Database size={20} />
+                        No students found
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  students.map((student) => (
+                    <tr key={student.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                      <td className="p-4">
+                        <div>
+                          <div className="font-medium" style={{color: '#4A4947'}}>
+                            {student.name}
+                          </div>
+                          <div className="text-sm text-gray-500 sm:hidden flex items-center gap-1">
+                            <Mail size={12} />
+                            {student.email}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-4 hidden sm:table-cell">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Mail size={16} />
+                          {student.email}
+                        </div>
+                      </td>
+                      <td className="p-4 hidden md:table-cell">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Phone size={16} />
+                          {student.phone || 'N/A'}
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <span className="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800">
+                          {student.course}
+                        </span>
+                      </td>
+                      <td className="p-4 hidden lg:table-cell">
+                        <span className="font-medium text-green-600">
+                          ₹{(student.fee_paid || 0).toLocaleString()}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <span className={`px-3 py-1 text-sm rounded-full ${
+                          student.status === 'active' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {student.status || 'active'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Student Applications */}
         <div className="bg-white rounded-2xl shadow-md border border-gray-100">
           <div className="p-4 sm:p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h3 className="text-lg font-semibold" style={{color: '#4A4947'}}>
@@ -671,100 +714,6 @@ export default function Dashboard() {
             </table>
           </div>
         </div>
-
-        {/* Students Table Section */}
-        <div className="bg-white rounded-2xl shadow-md border border-gray-100">
-          <div className="p-4 sm:p-6 border-b border-gray-100">
-            <h3 className="text-lg font-semibold" style={{color: '#4A4947'}}>
-              Current Students ({students.length})
-            </h3>
-          </div>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-100">
-                  <th className="text-left p-4 font-medium text-gray-600">Name</th>
-                  <th className="text-left p-4 font-medium text-gray-600 hidden sm:table-cell">Email</th>
-                  <th className="text-left p-4 font-medium text-gray-600 hidden md:table-cell">Phone</th>
-                  <th className="text-left p-4 font-medium text-gray-600">Course</th>
-                  <th className="text-left p-4 font-medium text-gray-600 hidden lg:table-cell">Fee Paid</th>
-                  <th className="text-left p-4 font-medium text-gray-600">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan="6" className="p-8 text-center text-gray-500">
-                      <div className="flex items-center justify-center gap-2">
-                        <RefreshCw size={20} className="animate-spin" />
-                        Loading students data...
-                      </div>
-                    </td>
-                  </tr>
-                ) : students.length === 0 ? (
-                  <tr>
-                    <td colSpan="6" className="p-8 text-center text-gray-500">
-                      <div className="flex items-center justify-center gap-2">
-                        <Database size={20} />
-                        No students found
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  students.map((student) => (
-                    <tr key={student.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                      <td className="p-4">
-                        <div>
-                          <div className="font-medium" style={{color: '#4A4947'}}>
-                            {student.name}
-                          </div>
-                          <div className="text-sm text-gray-500 sm:hidden flex items-center gap-1">
-                            <Mail size={12} />
-                            {student.email}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4 hidden sm:table-cell">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Mail size={16} />
-                          {student.email}
-                        </div>
-                      </td>
-                      <td className="p-4 hidden md:table-cell">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Phone size={16} />
-                          {student.phone || 'N/A'}
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <span className="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800">
-                          {student.course}
-                        </span>
-                      </td>
-                      <td className="p-4 hidden lg:table-cell">
-                        <span className="font-medium text-green-600">
-                          ₹{(student.fee_paid || 0).toLocaleString()}
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        <span className={`px-3 py-1 text-sm rounded-full ${
-                          student.status === 'active' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {student.status || 'active'}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-       
 
       </div>
 
