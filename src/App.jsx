@@ -1,5 +1,6 @@
 // App.jsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast"; // ⭐ Toast Support
 
 // Components
 import Navbar from "./components/Navbar";
@@ -9,7 +10,7 @@ import Whatsapp from "./components/Whatsapp";
 
 // Pages
 import Home from "./pages/Home";
-import About from "./pages/About";   // ✅ Added About Page
+import About from "./pages/About";
 import Courses from "./pages/Courses";
 import Contact from "./pages/Contact";
 import Register from "./pages/Register";
@@ -32,101 +33,44 @@ import StudentPayment from "./pages/StudentPayment";
 function App() {
   return (
     <Router>
-      <div className="flex flex-col min-h-screen">
-        <Routes>
-          {/* Public Routes with Navbar + Footer */}
-          <Route
-            path="/"
-            element={
-              <>
-                <Navbar />
-                <Home />
-                <Footer />
-              </>
-            }
-          />
-          <Route
-            path="/about"
-            element={
-              <>
-                <Navbar />
-                <About /> {/* ✅ Renders your About.jsx page */}
-                <Footer />
-              </>
-            }
-          />
-          <Route
-            path="/courses"
-            element={
-              <>
-                <Navbar />
-                <Courses />
-                <Footer />
-              </>
-            }
-          />
-          <Route
-            path="/contact"
-            element={
-              <>
-                <Navbar />
-                <Contact />
-                <Footer />
-              </>
-            }
-          />
-          <Route
-            path="/testimonials"
-            element={
-              <>
-                <Navbar />
-                <Testimonials />
-                <Footer />
-              </>
-            }
-          />
-          <Route
-            path="/gallery"
-            element={
-              <>
-                <Navbar />
-                <Gallery />
-                <Footer />
-              </>
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              <>
-                <Navbar />
-                <LoginPage />
-                <Footer />
-              </>
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              <>
-                <Navbar />
-                <Register />
-                <Footer />
-              </>
-            }
-          />
+      {/* ⭐ Global Toast Component */}
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 3000,
+          success: {
+            style: { background: "#4A4947", color: "white", fontWeight: "600" },
+          },
+          error: {
+            style: { background: "#FF3B30", color: "white", fontWeight: "600" },
+          },
+        }}
+      />
 
-          {/* Student Dashboard Routes */}
+      <div className="flex flex-col min-h-screen">
+
+        <Routes>
+          {/* ⭐ Public Routes */}
+          <Route path="/" element={<><Navbar /><Home /><Footer /></>} />
+          <Route path="/about" element={<><Navbar /><About /><Footer /></>} />
+          <Route path="/courses" element={<><Navbar /><Courses /><Footer /></>} />
+          <Route path="/contact" element={<><Navbar /><Contact /><Footer /></>} />
+          <Route path="/testimonials" element={<><Navbar /><Testimonials /><Footer /></>} />
+          <Route path="/gallery" element={<><Navbar /><Gallery /><Footer /></>} />
+          <Route path="/login" element={<><Navbar /><LoginPage /><Footer /></>} />
+          <Route path="/register" element={<><Navbar /><Register /><Footer /></>} />
+
+          {/* ⭐ Student Dashboard */}
           <Route path="/student" element={<StudentDashboard />}>
-            <Route index element={<DashboardStudent />} /> {/* /student */}
+            <Route index element={<DashboardStudent />} />
             <Route path="student-dashboard" element={<DashboardStudent />} />
-            <Route path="attendance" element={<StudentAttendance />} /> {/* /student/attendance */}
-            <Route path="payments" element={<StudentPayment />} /> {/* /student/payments */}
+            <Route path="attendance" element={<StudentAttendance />} />
+            <Route path="payments" element={<StudentPayment />} />
           </Route>
 
-          {/* Admin Dashboard Routes */}
+          {/* ⭐ Admin Dashboard */}
           <Route path="/admin" element={<AdminDashboard />}>
-            <Route index element={<Dashboard />} />   {/* Default page when visiting /admin */}
+            <Route index element={<Dashboard />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="students" element={<Students />} />
             <Route path="attendance" element={<Attendance />} />
@@ -134,7 +78,7 @@ function App() {
           </Route>
         </Routes>
 
-        {/* ✅ WhatsApp button is always available */}
+        {/* 📌 WhatsApp Floating Button always visible */}
         <Whatsapp />
       </div>
     </Router>

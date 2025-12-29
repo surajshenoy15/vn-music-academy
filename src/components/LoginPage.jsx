@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { User, Shield, Mail, Lock, Send, ArrowLeft } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+
 
 const LoginPage = () => {
   const [userType, setUserType] = useState('student'); // 'student' or 'admin'
@@ -17,7 +19,7 @@ const LoginPage = () => {
 
   const handleSendOTP = async () => {
     if (!studentEmail || !studentEmail.includes('@')) {
-      alert('Please enter a valid email address');
+      toast.error("Please enter a valid email address");
       return;
     }
     
@@ -58,15 +60,15 @@ const LoginPage = () => {
       console.log("Send OTP Success:", data);
 
       setOtpSent(true);
-      alert('✅ OTP sent to your email address! Please check your inbox.');
+      toast.success("OTP sent! Please check your email inbox.");
       
     } catch (err) {
       console.error("Send OTP error:", err);
       
       if (err.name === 'TypeError' || err.message.includes('fetch')) {
-        alert('❌ Unable to connect to server. Please check if the backend is running.');
+        toast.error("Unable to connect to server. Check if backend is running.");
       } else {
-        alert(`❌ ${err.message}`);
+       toast.error(err.message);
       }
     } finally {
       setLoading(false);
@@ -75,7 +77,7 @@ const LoginPage = () => {
 
   const handleStudentLogin = async () => {
     if (!otp || otp.length !== 6) {
-      alert('Please enter a valid 6-digit OTP');
+      toast.error("Enter a valid 6-digit OTP");
       return;
     }
     
@@ -140,17 +142,17 @@ const LoginPage = () => {
       }
 
       // Force navbar to update immediately
-      // if (window.forceNavbarUpdate) {
-      //   console.log("🔄 Calling forceNavbarUpdate for student");
-      //   window.forceNavbarUpdate();
-      // }
+      if (window.forceNavbarUpdate) {
+        console.log("🔄 Calling forceNavbarUpdate for student");
+        window.forceNavbarUpdate();
+      }
 
       // Dispatch custom event for navbar
       window.dispatchEvent(new Event('studentLoginSuccess'));
       console.log("📡 studentLoginSuccess event dispatched");
 
       // Show success message
-      alert('✅ Login successful! Redirecting to dashboard...');
+      toast.success("Login successful! Redirecting...");
 
       // Navigate to student dashboard
       setTimeout(() => {
@@ -162,9 +164,9 @@ const LoginPage = () => {
       console.error("Student login error:", err);
       
       if (err.name === 'TypeError' || err.message.includes('fetch')) {
-        alert('❌ Unable to connect to server. Please check if the backend is running.');
+        toast.error("Unable to connect to server. Check backend connection.");
       } else {
-        alert(`❌ ${err.message}`);
+        toast.error(err.message);
       }
     } finally {
       setLoading(false);
@@ -177,7 +179,7 @@ const LoginPage = () => {
     console.log("Admin password:", adminPassword ? "***PROVIDED***" : "***MISSING***");
     
     if (!adminEmail || !adminPassword) {
-      alert('Please enter both email and password');
+       toast.error("Enter both email & password");
       return;
     }
 
@@ -284,7 +286,7 @@ const LoginPage = () => {
       console.log("✅ loginSuccess event dispatched");
 
       // Show success message
-      alert('✅ Admin login successful! Redirecting to dashboard...');
+      toast.success("Admin login successful! Redirecting...");
 
       // Final verification after a delay
       setTimeout(() => {
@@ -309,9 +311,9 @@ const LoginPage = () => {
       console.error("❌ Admin login error:", err);
       
       if (err.name === 'TypeError' || err.message.includes('fetch')) {
-        alert('❌ Unable to connect to server. Please check if the backend is running.');
+        toast.error("Unable to connect to server. Check backend connection.");
       } else {
-        alert(`❌ ${err.message}`);
+        toast.error(err.message);
       }
     } finally {
       setLoading(false);
