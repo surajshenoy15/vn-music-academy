@@ -2,12 +2,12 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": "/"
     }
   ],
   "headers": [
     {
-      "source": "/(.*\\.xml)",
+      "source": "/(.*\\.xml)$",
       "headers": [
         {
           "key": "Content-Type",
