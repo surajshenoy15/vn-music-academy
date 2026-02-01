@@ -1,92 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-  <!-- Public Pages -->
   <url>
-    <loc>https://vnmusicacademy.com/</loc>
+    <loc>https://www.vnmusicacademy.com/</loc>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://vnmusicacademy.com/about</loc>
+    <loc>https://www.vnmusicacademy.com/about</loc>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://vnmusicacademy.com/courses</loc>
+    <loc>https://www.vnmusicacademy.com/courses</loc>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://vnmusicacademy.com/contact</loc>
+    <loc>https://www.vnmusicacademy.com/contact</loc>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://vnmusicacademy.com/testimonials</loc>
+    <loc>https://www.vnmusicacademy.com/testimonials</loc>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://vnmusicacademy.com/gallery</loc>
+    <loc>https://www.vnmusicacademy.com/gallery</loc>
     <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://vnmusicacademy.com/login</loc>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
-    <loc>https://vnmusicacademy.com/register</loc>
-    <priority>0.5</priority>
-  </url>
-
-  <!-- Student Dashboard Routes -->
-  <url>
-    <loc>https://vnmusicacademy.com/student</loc>
-    <priority>0.6</priority>
-  </url>
-
-  <url>
-    <loc>https://vnmusicacademy.com/student/student-dashboard</loc>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
-    <loc>https://vnmusicacademy.com/student/attendance</loc>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
-    <loc>https://vnmusicacademy.com/student/payments</loc>
-    <priority>0.5</priority>
-  </url>
-
-  <!-- Admin Dashboard Routes -->
-  <url>
-    <loc>https://vnmusicacademy.com/admin</loc>
-    <priority>0.6</priority>
-  </url>
-
-  <url>
-    <loc>https://vnmusicacademy.com/admin/dashboard</loc>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
-    <loc>https://vnmusicacademy.com/admin/students</loc>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
-    <loc>https://vnmusicacademy.com/admin/attendance</loc>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
-    <loc>https://vnmusicacademy.com/admin/payments</loc>
-    <priority>0.5</priority>
   </url>
 
 </urlset>
