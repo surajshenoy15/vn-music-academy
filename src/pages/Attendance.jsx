@@ -17,7 +17,7 @@ const Attendance = () => {
   const [attendance, setAttendance] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedTiming, setSelectedTiming] = useState('6:00pm - 7:00pm');
-  const [filterType, setFilterType] = useState('daily');
+  const [filterType, setFilterType] = useState('all');
   const [selectedStudent, setSelectedStudent] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateSession, setShowCreateSession] = useState(false);
