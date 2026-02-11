@@ -39,7 +39,7 @@ const AboutUs = () => {
               </h2>
             </div>
             <p className="text-lg text-gray-600 leading-relaxed text-center max-w-4xl mx-auto">
-              Empowering musicians, performers, andproducers with expertise, future-ready techskills, and creative and financial success in theevolving music industry.
+             Empowering musicians, performers, and producers with expertise, future-ready tech skills, and the tools for creative and financial success in the evolving music industry.
             </p>
           </div>
         </div>
@@ -67,14 +67,14 @@ const AboutUs = () => {
                 Legacy & Innovation
               </div>
               <h2 className="text-3xl md:text-4xl font-light text-[#4A4947]">
-                Five Decades of <span className="font-semibold">Musical Heritage</span>
+                A Decades of <span className="font-semibold">Musical Heritage</span>
               </h2>
               <div className="w-16 h-0.5 bg-[#4A4947]"></div>
               <p className="text-gray-600 leading-relaxed text-base">
-                Founded in 2016 by Vishal Naidruv, a composerand music producer in the Indian Film Industry,VN Academy has taught hundreds of studentsskills in music, including piano, guitar, musicproduction, recording, songwriting, mixing, andmastering.
+                Founded in 2016 by Vishal Naidruv, a composerand music producer in the Indian Film IndusFounded in 2016 by Vishal Naidruv, a composer and music producer in the Indian film industry, VN Academy has taught hundreds of students skills in music, including piano, guitar, music production, recording, songwriting, mixing, and mastering.try,VN Academy has taught hundreds of studentsskills in music, including piano, guitar, musicproduction, recording, songwriting, mixing, andmastering.
               </p>
               <p className="text-gray-600 leading-relaxed text-base">
-               With 10+ years of experience, we’ve shaped the next generation of musicians through passionate, precise, and deeply informed training, guiding over 100 students of all ages toward their musical goals. Our career-focused mentorship has helped more than 10 learners become full-time music professionals. Under the guidance of Vishal Naidruv,an experienced Music Producer & Composer—students gain exclusive access to his studio, production workflow, and post-production techniques, empowering them to grow in today’s evolving music industry.
+               With over 10 years of experience, we have shaped the next generation of musicians through passionate, precise, and deeply informed training, guiding more than 100 students of all ages toward their musical goals. Our career-focused mentorship has helped over 10 learners become full-time music professionals. Under the guidance of Vishal Naidruv, an experienced music producer and composer, students gain exclusive access to his studio, production workflow, and post-production techniques—empowering them to thrive in today’s evolving music industry.
               </p>
               <div className="grid grid-cols-3 gap-6 pt-6">
                 <div>
