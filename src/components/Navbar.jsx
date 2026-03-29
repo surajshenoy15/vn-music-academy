@@ -64,13 +64,13 @@ const Navbar = ({ isDashboard = false, onSidebarOpen }) => {
             </button>
           )}
 
-          {/* Logo */}
+          {/* Logo — h-10 to prevent oversized click area blocking page buttons */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-60 h-60 overflow-hidden">
+            <div className="h-10 w-auto overflow-hidden">
               <img
                 src="/logo-name.png"
                 alt="VN Music Academy Logo"
-                className="w-full h-full object-contain"
+                className="h-full w-auto object-contain"
               />
             </div>
           </Link>
