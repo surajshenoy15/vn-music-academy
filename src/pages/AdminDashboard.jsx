@@ -7,10 +7,10 @@ import Navbar from "../components/Navbar";
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [authChecked, setAuthChecked] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("adminToken");
-
     if (!token) {
       navigate("/login", { replace: true });
     } else {
@@ -28,12 +28,10 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex">
-      <Sidebar />
-      <div className="flex-1 flex flex-col min-h-screen bg-white md:ml-60">
-        <div className="pl-14 md:pl-0">
-          <Navbar />
-        </div>
-        <main className="flex-1 p-4 md:p-6 mt-2 md:mt-4">
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="flex-1 flex flex-col min-h-screen bg-white w-full md:ml-60">
+        <Navbar isDashboard={true} onSidebarOpen={() => setSidebarOpen(true)} />
+        <main className="flex-1 p-4 md:p-6">
           <Outlet />
         </main>
         <Footer />

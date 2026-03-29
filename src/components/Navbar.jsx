@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
-const Navbar = () => {
+const Navbar = ({ isDashboard = false, onSidebarOpen }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userType, setUserType] = useState(null); // 'admin' or 'student'
@@ -47,9 +47,23 @@ const Navbar = () => {
   }, [navigate]);
 
   return (
-    <nav className="relative z-50 bg-white text-black shadow-md">
+    <nav className="relative z-30 bg-white text-black shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
+
+          {/* Dashboard mobile: single hamburger inside navbar to open sidebar */}
+          {isDashboard && onSidebarOpen && (
+            <button
+              onClick={onSidebarOpen}
+              className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg bg-[#4A4947] text-white mr-2 shrink-0"
+              aria-label="Open menu"
+            >
+              <svg className="h-5 w-5" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          )}
+
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <div className="w-60 h-60 overflow-hidden">
@@ -146,32 +160,45 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-black hover:text-[#4A4947]"
-            >
-              <svg
-                className="h-6 w-6"
-                stroke="currentColor"
-                fill="none"
-                viewBox="0 0 24 24"
+          {/* Mobile Menu Button — hidden inside dashboard (sidebar handles nav) */}
+          {!isDashboard && (
+            <div className="md:hidden">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="text-black hover:text-[#4A4947]"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
+                <svg
+                  className="h-6 w-6"
+                  stroke="currentColor"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {/* Dashboard mobile: show only logout button */}
+          {isDashboard && isLoggedIn && (
+            <button
+              onClick={handleLogout}
+              className="md:hidden bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-sm font-medium"
+            >
+              Logout
             </button>
-          </div>
+          )}
+
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
+      {/* Mobile Menu — not shown inside dashboard */}
+      {!isDashboard && isMenuOpen && (
         <div className="md:hidden bg-white text-black px-4 pb-4 space-y-2 relative z-[60]">
           <Link
             to="/"
