@@ -13,13 +13,13 @@ export default function Students() {
   };
 
   return (
-    // ✅ Added relative + z-50 so this container sits above any navbar/logo overlay
-    <div className="relative z-50 p-6 bg-white rounded-lg shadow-md">
-      <div className="flex space-x-4 mb-6">
+    <div className="w-full">
+      {/* Tab buttons */}
+      <div className="flex gap-3 mb-4 px-1">
         <button
           type="button"
-          className={`px-4 py-2 rounded cursor-pointer ${
-            activeTab === "add" ? "bg-[#4A4947] text-white" : "bg-gray-200"
+          className={`px-4 py-2 rounded text-sm font-medium cursor-pointer transition-colors ${
+            activeTab === "add" ? "bg-[#4A4947] text-white" : "bg-gray-200 hover:bg-gray-300"
           }`}
           onClick={() => handleTabChange("add")}
         >
@@ -28,8 +28,8 @@ export default function Students() {
 
         <button
           type="button"
-          className={`px-4 py-2 rounded cursor-pointer ${
-            activeTab === "list" ? "bg-[#4A4947] text-white" : "bg-gray-200"
+          className={`px-4 py-2 rounded text-sm font-medium cursor-pointer transition-colors ${
+            activeTab === "list" ? "bg-[#4A4947] text-white" : "bg-gray-200 hover:bg-gray-300"
           }`}
           onClick={() => handleTabChange("list")}
         >
