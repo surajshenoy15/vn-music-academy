@@ -1,24 +1,41 @@
+import { useEffect, useState } from "react";
+import { useNavigate, Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
-import Navbar from "../components/Navbar"; // ✅ Import Navbar
-import { Outlet } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("adminToken");
+
+    if (!token) {
+      navigate("/login", { replace: true });
+    } else {
+      setAuthChecked(true);
+    }
+  }, [navigate]);
+
+  if (!authChecked) {
+    return (
+      <div className="flex items-center justify-center h-screen text-gray-600">
+        Checking login…
+      </div>
+    );
+  }
+
   return (
     <div className="flex">
-      {/* Fixed Sidebar */}
       <Sidebar />
-
-      {/* Main Content */}
-      <div className="ml-60 flex-1 flex flex-col min-h-screen bg-white">
-        {/* Navbar at top */}
-        <Navbar />
-
-        {/* Page Content */}
-        <main className="flex-1 p-6 mt-4">
-          <Outlet /> {/* ✅ This renders Dashboard, Students, or Attendance */}
+      <div className="flex-1 flex flex-col min-h-screen bg-white md:ml-60">
+        <div className="pl-14 md:pl-0">
+          <Navbar />
+        </div>
+        <main className="flex-1 p-4 md:p-6 mt-2 md:mt-4">
+          <Outlet />
         </main>
-
         <Footer />
       </div>
     </div>
