@@ -64,7 +64,8 @@ const fetchAttendance = async () => {
           phone
         )
       `)
-      .order('date', { ascending: false });
+      .order('date', { ascending: false })
+      .range(0, 1999);
 
     if (error) throw error;
     setAttendance(data || []);
