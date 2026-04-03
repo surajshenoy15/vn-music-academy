@@ -50,29 +50,28 @@ const [editSessionName, setEditSessionName] = useState('');
   };
 
   // Fetch attendance records from Supabase (only present students)
-  const fetchAttendance = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('attendance')
-        .select(`
-          *,
-          students (
-            id,
-            name,
-            email,
-            phone
-          )
-        `)
-        .eq('status', 'present') // Only fetch present students
-        .order('date', { ascending: false });
-      
-      if (error) throw error;
-      setAttendance(data || []);
-    } catch (error) {
-      console.error('Error fetching attendance:', error);
-    }
-  };
+  // Fetch all attendance records from Supabase
+const fetchAttendance = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('attendance')
+      .select(`
+        *,
+        students (
+          id,
+          name,
+          email,
+          phone
+        )
+      `)
+      .order('date', { ascending: false });
 
+    if (error) throw error;
+    setAttendance(data || []);
+  } catch (error) {
+    console.error('Error fetching attendance:', error);
+  }
+};
   // Create new session (with or without students)
 const createSession = async () => {
   try {
@@ -210,39 +209,46 @@ const createSession = async () => {
   };
 
   // Get filtered attendance data
-  const getFilteredAttendance = () => {
-    let filteredData = attendance.filter(record => record.student_id !== null); // Only show records with students
+ // Get filtered attendance data
+const getFilteredAttendance = () => {
+  let filteredData = [...attendance]; // include all records
 
-    // Filter by search term
-    if (searchTerm) {
-      filteredData = filteredData.filter(record => 
-        record.students?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        record.session_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filter by search term
+  if (searchTerm) {
+    filteredData = filteredData.filter(record =>
+      (record.students?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (record.session_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (record.status || '').toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
+
+  // Filter by student
+  if (selectedStudent !== 'all') {
+    filteredData = filteredData.filter(record => record.student_id === selectedStudent);
+  }
+
+  // Filter by date range
+  const currentDate = new Date();
+  if (filterType === 'weekly') {
+    const weekStart = new Date();
+    weekStart.setDate(currentDate.getDate() - currentDate.getDay());
+    weekStart.setHours(0, 0, 0, 0);
+
+    filteredData = filteredData.filter(record => new Date(record.date) >= weekStart);
+  } else if (filterType === 'monthly') {
+    filteredData = filteredData.filter(record => {
+      const recordDate = new Date(record.date);
+      return (
+        recordDate.getMonth() + 1 === selectedMonth &&
+        recordDate.getFullYear() === selectedYear
       );
-    }
+    });
+  } else if (filterType === 'daily') {
+    filteredData = filteredData.filter(record => record.date === selectedDate);
+  }
 
-    // Filter by student
-    if (selectedStudent !== 'all') {
-      filteredData = filteredData.filter(record => record.student_id === selectedStudent);
-    }
-
-    // Filter by date range
-    const currentDate = new Date();
-    if (filterType === 'weekly') {
-      const weekStart = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay()));
-      weekStart.setHours(0, 0, 0, 0);
-      filteredData = filteredData.filter(record => new Date(record.date) >= weekStart);
-    } else if (filterType === 'monthly') {
-      filteredData = filteredData.filter(record => {
-        const recordDate = new Date(record.date);
-        return recordDate.getMonth() + 1 === selectedMonth && recordDate.getFullYear() === selectedYear;
-      });
-    } else if (filterType === 'daily') {
-      filteredData = filteredData.filter(record => record.date === selectedDate);
-    }
-
-    return filteredData;
-  };
+  return filteredData;
+};
 
   // Export to CSV
   const exportToCSV = () => {
@@ -276,7 +282,7 @@ const exportToPDF = () => {
   // Set title with custom color
   doc.setTextColor(74, 73, 71); // #4A4947
   doc.setFontSize(16);
-  doc.text("Attendance Report - Present Students", 14, 15);
+  doc.text("Attendance Report - All Records", 14, 15);
 
   const tableColumn = ["S.No.", "Student Name", "Date", "Time", "Session"];
   const tableRows = filteredData.map((record, index) => [
@@ -309,48 +315,63 @@ const exportToPDF = () => {
     }
   });
 
-  doc.save(`attendance_present_${filterType}_${new Date().toISOString().split("T")[0]}.pdf`);
+  doc.save(`attendance_all_${filterType}_${new Date().toISOString().split("T")[0]}.pdf`);
 };
 
   // Get attendance statistics (only present students)
-  const getAttendanceStats = () => {
-    const filteredData = getFilteredAttendance();
-    const totalRecords = filteredData.length;
-    const uniqueDates = [...new Set(filteredData.map(record => `${record.date}-${record.timing}`))].length;
-    const avgStudentsPerSession = uniqueDates > 0 ? (totalRecords / uniqueDates).toFixed(1) : 0;
-    const uniqueSessions = [...new Set(filteredData.map(record => record.session_name || ''))].length;
+ const getAttendanceStats = () => {
+  const filteredData = getFilteredAttendance();
 
-    return { 
-      totalRecords, 
-      uniqueDates, 
-      avgStudentsPerSession,
-      totalStudents: students.length,
-      uniqueSessions
-    };
+  const totalRecords = filteredData.length;
+
+  const uniqueDates = [
+    ...new Set(filteredData.map(record => `${record.date}-${record.timing}`))
+  ].length;
+
+  const presentStudentRecords = filteredData.filter(
+    record => record.student_id !== null && record.status === 'present'
+  );
+
+  const avgStudentsPerSession =
+    uniqueDates > 0 ? (presentStudentRecords.length / uniqueDates).toFixed(1) : 0;
+
+  const uniqueSessions = [
+    ...new Set(filteredData.map(record => `${record.date}-${record.timing}`))
+  ].length;
+
+  return {
+    totalRecords,
+    uniqueDates,
+    avgStudentsPerSession,
+    totalStudents: students.length,
+    uniqueSessions
   };
+};
 
   // Get unique sessions for current filters
-  const getUniqueSessions = () => {
-    const filteredData = getFilteredAttendance();
-    const sessions = {};
-    
-    filteredData.forEach(record => {
-      const sessionKey = `${record.date}-${record.timing}`;
-      if (!sessions[sessionKey]) {
-        sessions[sessionKey] = {
-          date: record.date,
-          timing: record.timing,
-          session_name: record.session_name || '',
-          students: []
-        };
-      }
-      if (record.student_id) {
-        sessions[sessionKey].students.push(record);
-      }
-    });
-    
-    return Object.values(sessions).sort((a, b) => new Date(b.date) - new Date(a.date));
-  };
+ const getUniqueSessions = () => {
+  const filteredData = getFilteredAttendance();
+  const sessions = {};
+
+  filteredData.forEach(record => {
+    const sessionKey = `${record.date}-${record.timing}`;
+
+    if (!sessions[sessionKey]) {
+      sessions[sessionKey] = {
+        date: record.date,
+        timing: record.timing,
+        session_name: record.session_name || '',
+        students: []
+      };
+    }
+
+    if (record.student_id && record.status === 'present') {
+      sessions[sessionKey].students.push(record);
+    }
+  });
+
+  return Object.values(sessions).sort((a, b) => new Date(b.date) - new Date(a.date));
+};
   // Update session name
 const updateSessionName = async (date, timing, oldSessionName) => {
   try {
@@ -534,7 +555,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                 <Users className="h-6 w-6 text-green-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Present Records</p>
+                <p className="text-sm font-medium text-gray-600">Total Records</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalRecords}</p>
               </div>
             </div>
