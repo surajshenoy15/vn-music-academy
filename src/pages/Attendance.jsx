@@ -30,7 +30,7 @@ const Attendance = () => {
   const [modalSearchTerm, setModalSearchTerm] = useState('');
   const [sessionsCurrentPage, setSessionsCurrentPage] = useState(1);
 const [attendanceCurrentPage, setAttendanceCurrentPage] = useState(1);
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 40;
 const [editingSession, setEditingSession] = useState(null);
 const [editSessionName, setEditSessionName] = useState('');
 
