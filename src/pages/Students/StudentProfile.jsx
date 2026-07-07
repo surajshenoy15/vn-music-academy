@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import { User, MessageCircle, Send, Users, Loader2, Calendar, Mail } from "lucide-react";
-import { createClient } from "@supabase/supabase-js";
+import { createSupabaseClient } from "../../supabaseClient";
 
 // Supabase setup
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabase = createSupabaseClient();
 
 export default function StudentsProfileDisplay() {
   const [students, setStudents] = useState([]);

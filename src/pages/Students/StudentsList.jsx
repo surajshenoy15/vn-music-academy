@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Search, Eye, Users, Mail, Phone, BookOpen, Calendar, Hash, Loader2, AlertCircle, RefreshCw, Plus, Edit, Trash2, Upload, X, User, Check, Camera, ChevronDown, Music } from "lucide-react";
 import { supabase } from "../../supabaseClient";
+import { formatValidityDate, isMissingColumnError, normalizeValidityDate, saveStoredSessionValidity } from "../../utils/sessionValidity";
 
 export default function StudentsList({ onSelectStudent, refreshTrigger }) {
   const [students, setStudents] = useState([]);
@@ -96,7 +97,8 @@ export default function StudentsList({ onSelectStudent, refreshTrigger }) {
       email: student.email || '',
       phone: student.phone || '',
       course: student.course || '',
-      age: student.age || ''
+      age: student.age || '',
+      session_validity_end: student.session_validity_end || ''
     });
   };
 
@@ -108,20 +110,34 @@ export default function StudentsList({ onSelectStudent, refreshTrigger }) {
     e.preventDefault();
     setIsEditing(true);
     try {
-      const { error } = await supabase
+      const normalizedValidityDate = normalizeValidityDate(editFormData.session_validity_end);
+      const basePayload = {
+        name: editFormData.name,
+        email: editFormData.email,
+        phone: editFormData.phone,
+        course: editFormData.course,
+        age: editFormData.age ? parseInt(editFormData.age, 10) : null,
+      };
+      const updatePayload = { ...basePayload };
+      if (normalizedValidityDate) {
+        updatePayload.session_validity_end = normalizedValidityDate;
+      }
+
+      let { error } = await supabase
         .from('students')
-        .update({
-          name: editFormData.name,
-          email: editFormData.email,
-          phone: editFormData.phone,
-          course: editFormData.course,
-          age: editFormData.age ? parseInt(editFormData.age, 10) : null
-        })
+        .update(updatePayload)
         .eq('id', editingStudent.id);
+
+      if (error && isMissingColumnError(error)) {
+        const fallbackPayload = { ...basePayload };
+        ({ error } = await supabase.from('students').update(fallbackPayload).eq('id', editingStudent.id));
+      }
+
       if (error) throw error;
+      saveStoredSessionValidity(editingStudent, normalizedValidityDate);
       setStudents(students.map(student =>
         student.id === editingStudent.id
-          ? { ...student, ...editFormData, age: editFormData.age ? parseInt(editFormData.age, 10) : null }
+          ? { ...student, ...editFormData, age: editFormData.age ? parseInt(editFormData.age, 10) : null, session_validity_end: normalizedValidityDate || null }
           : student
       ));
       setEditingStudent(null);
@@ -361,6 +377,9 @@ export default function StudentsList({ onSelectStudent, refreshTrigger }) {
                     <th className="px-6 py-4 text-left text-white font-semibold">
                       <div className="flex items-center space-x-2"><Calendar className="w-4 h-4" /><span>Age</span></div>
                     </th>
+                    <th className="px-6 py-4 text-left text-white font-semibold">
+                      <div className="flex items-center space-x-2"><Calendar className="w-4 h-4" /><span>Validity</span></div>
+                    </th>
                     <th className="px-6 py-4 text-center text-white font-semibold">Actions</th>
                   </tr>
                 </thead>
@@ -404,6 +423,11 @@ export default function StudentsList({ onSelectStudent, refreshTrigger }) {
                         <span className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">{student.course || 'No Course'}</span>
                       </td>
                       <td className="px-6 py-4"><div className="text-gray-700">{student.age || '-'}</div></td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-700">
+                          {student.session_validity_end ? formatValidityDate(student.session_validity_end) : 'Not set'}
+                        </div>
+                      </td>
                       <td className="px-6 py-4 text-center">
                         <div className="flex items-center justify-center space-x-2">
                           <button onClick={() => handleViewStudent(student)} className="p-2 rounded-lg text-white transition-all duration-200 hover:shadow-md" style={{ backgroundColor: '#4A4947' }} title="View Details">
@@ -507,6 +531,10 @@ export default function StudentsList({ onSelectStudent, refreshTrigger }) {
                       <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
                       <span className="text-sm text-gray-700">{student.age ? `${student.age} years old` : 'Age not provided'}</span>
                     </div>
+                    <div className="flex items-center gap-3">
+                      <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
+                      <span className="text-sm text-gray-700">Validity: {student.session_validity_end ? formatValidityDate(student.session_validity_end) : 'Not set'}</span>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -571,6 +599,11 @@ export default function StudentsList({ onSelectStudent, refreshTrigger }) {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Age</label>
                   <input type="number" name="age" value={editFormData.age} onChange={handleEditChange}
+                    className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Sessions Validity End Date</label>
+                  <input type="date" name="session_validity_end" value={editFormData.session_validity_end || ''} onChange={handleEditChange}
                     className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2" />
                 </div>
                 <div className="flex space-x-3 pt-4">

@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, Download, Filter, Plus, Search, Users, FileText, Grid, BarChart3, Eye, Edit, Trash2, X, Check } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { createSupabaseClient } from "../supabaseClient";
 
 // Initialize Supabase client
 // ✅ Correct for Vite
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createSupabaseClient();
 
 const Attendance = () => {
   const [students, setStudents] = useState([]);

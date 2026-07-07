@@ -14,12 +14,11 @@ import {
   Download,
   Search,
 } from "lucide-react";
-import { createClient } from "@supabase/supabase-js";
+import { buildValidityReminderText } from "../utils/sessionValidity";
+import { createSupabaseClient } from "../supabaseClient";
 
 // Supabase client - keeping exact same configuration
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createSupabaseClient();
 
 const StudentAttendance = () => {
   const [student, setStudent] = useState(null);
@@ -167,6 +166,7 @@ const ITEMS_PER_PAGE = 20;
     </span>
   );
 
+  const validityReminder = buildValidityReminderText(student?.session_validity_end || "");
   const filteredAttendance = getFilteredAttendance();
 
   if (loading) {
@@ -317,6 +317,13 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
             </button>
           </div>
         </div>
+
+        {validityReminder && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+            <Calendar className="w-5 h-5 text-amber-600 mt-0.5" />
+            <p className="text-sm font-medium text-amber-800">{validityReminder}</p>
+          </div>
+        )}
 
         {/* Stats Cards - Following admin design pattern */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">

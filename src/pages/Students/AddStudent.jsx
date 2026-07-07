@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { User, Mail, Phone, BookOpen, Calendar, Plus, CheckCircle, AlertCircle, ChevronDown, Music, Upload, X, Camera } from "lucide-react";
 import { supabase } from "../../supabaseClient";
+import { isMissingColumnError, normalizeValidityDate, saveStoredSessionValidity } from "../../utils/sessionValidity";
 
 export default function AddStudent() {
   const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ export default function AddStudent() {
     phone: "",
     course: "",
     age: "",
+    session_validity_end: "",
     profile_pic: null,
   });
 
@@ -54,7 +56,7 @@ export default function AddStudent() {
     setIsSubmitting(true);
 
     try {
-      const { firstName, lastName, email, phone, course, age, profile_pic } = formData;
+      const { firstName, lastName, email, phone, course, age, session_validity_end, profile_pic } = formData;
       const fullName = `${firstName.trim()} ${lastName.trim()}`;
       let profilePicUrl = null;
 
@@ -80,22 +82,36 @@ export default function AddStudent() {
         profilePicUrl = publicUrl.publicUrl;
       }
 
-      // Insert student into DB
-      const { error } = await supabase.from("students").insert([
-        {
-          name: fullName,
-          email,
-          phone,
-          course,
-          age: age ? parseInt(age, 10) : null,
-          profile_pic: profilePicUrl,
-        },
-      ]);
+      const normalizedValidityDate = normalizeValidityDate(session_validity_end);
+      const basePayload = {
+        name: fullName,
+        email,
+        phone,
+        course,
+        age: age ? parseInt(age, 10) : null,
+        profile_pic: profilePicUrl,
+      };
+
+      let insertPayload = { ...basePayload };
+      if (normalizedValidityDate) {
+        insertPayload.session_validity_end = normalizedValidityDate;
+      }
+
+      let { data, error } = await supabase.from("students").insert([insertPayload]).select("id, email").single();
+
+      if (error && isMissingColumnError(error)) {
+        const fallbackPayload = { ...basePayload };
+        ({ data, error } = await supabase.from("students").insert([fallbackPayload]).select("id, email").single());
+      }
 
       if (error) {
         console.error("Supabase Insert Error:", error.message);
         showNotification("Error: " + error.message, "error");
         return;
+      }
+
+      if (data) {
+        saveStoredSessionValidity({ id: data.id, email: data.email }, normalizedValidityDate);
       }
 
       showNotification("Student added successfully! 🎉", "success");
@@ -108,6 +124,7 @@ export default function AddStudent() {
         phone: "",
         course: "",
         age: "",
+        session_validity_end: "",
         profile_pic: null,
       });
       setProfilePreview(null);
@@ -331,6 +348,26 @@ export default function AddStudent() {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Validity Date */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Sessions Validity End Date
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Calendar className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="date"
+                  name="session_validity_end"
+                  value={formData.session_validity_end}
+                  onChange={handleInputChange}
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all"
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-2">Choose the date when this student’s sessions should expire.</p>
             </div>
 
             {/* Course Dropdown */}

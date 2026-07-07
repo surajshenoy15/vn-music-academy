@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Users, BookOpen, CalendarCheck, DollarSign, Bell, X, Check, Trash2, Edit3, AlertCircle, TrendingUp, Mail, Phone, RefreshCw, Database } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
+import { createSupabaseClient } from '../supabaseClient';
 
 // Initialize Supabase client with environment variables
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase environment variables. Please check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY');
-}
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabase = createSupabaseClient();
 
 // Toast Component
 const Toast = ({ message, type, onClose }) => {

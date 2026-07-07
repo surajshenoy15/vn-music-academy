@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { createClient } from "@supabase/supabase-js";
 import { User, Mail, Phone, Clock, AlertCircle, RefreshCw, Calendar, CheckCircle, XCircle, MessageSquare, TrendingUp, Edit3, Save, X, Upload, Image } from "lucide-react";
+import { buildValidityReminderText, getStoredSessionValidity } from "../utils/sessionValidity";
+import { createSupabaseClient } from "../supabaseClient";
 
 // Initialize Supabase client
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabase = createSupabaseClient();
 
 export default function DashboardStudent() {
   const [student, setStudent] = useState(null);
@@ -46,6 +45,11 @@ const ITEMS_PER_PAGE = 20;
       const parsedStudent = JSON.parse(storedStudent);
       console.log("Parsed student:", parsedStudent);
       setStudent(parsedStudent);
+
+      const validityDate = getStoredSessionValidity(parsedStudent) || parsedStudent.session_validity_end || "";
+      if (validityDate) {
+        parsedStudent.session_validity_end = validityDate;
+      }
       
       // Initialize edit form with current data
       setEditForm({
@@ -240,6 +244,8 @@ const ITEMS_PER_PAGE = 20;
   };
 
   // Calculate stats - simple and direct
+  const validityReminder = buildValidityReminderText(student?.session_validity_end || "");
+
   const calculateStats = () => {
     console.log("Calculating stats with attendance:", attendance);
     if (!attendance || attendance.length === 0) {
@@ -463,6 +469,14 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                       <div className="flex items-center gap-3 text-gray-600">
                         <User size={16} className="text-[#4A4947]" />
                         <span className="text-sm">Age: {student.age}</span>
+                      </div>
+                    )}
+                    {validityReminder && (
+                      <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-left">
+                        <div className="flex items-start gap-2 text-amber-800">
+                          <AlertCircle size={16} className="mt-0.5" />
+                          <span className="text-sm font-medium">{validityReminder}</span>
+                        </div>
                       </div>
                     )}
                   </div>
