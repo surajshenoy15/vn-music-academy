@@ -107,7 +107,7 @@ export const buildValidityReminderText = (value) => {
   expiryDate.setHours(0, 0, 0, 0);
 
   const isExpired = expiryDate < today;
-  const label = isExpired ? "Your sessions validity expired on" : "Your sessions validity ends on";
+  const label = isExpired ? "Please renew your session by" : "Please renew your session by";
 
   return `${label} ${formatValidityDate(normalizedDate)}.`;
 };
