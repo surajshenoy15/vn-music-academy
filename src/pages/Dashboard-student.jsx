@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { User, Mail, Phone, Clock, AlertCircle, RefreshCw, Calendar, CheckCircle, XCircle, MessageSquare, TrendingUp, Edit3, Save, X, Upload, Image } from "lucide-react";
-import { buildValidityReminderText, getStoredSessionValidity } from "../utils/sessionValidity";
+import {
+  buildValidityReminderText,
+} from "../utils/sessionValidity";
 import { createSupabaseClient } from "../supabaseClient";
 
 // Initialize Supabase client
@@ -32,44 +34,114 @@ const ITEMS_PER_PAGE = 20;
   console.log("Current attendance:", attendance);
 
   // Fetch student info from localStorage
-  useEffect(() => {
-    console.log("useEffect running...");
-    const storedStudent = localStorage.getItem("studentData");
-    if (!storedStudent) {
-      setError("Not logged in. Please log in first.");
-      setLoading(false);
-      return;
-    }
-
+useEffect(() => {
+  const loadStudentDashboard = async () => {
     try {
-      const parsedStudent = JSON.parse(storedStudent);
-      console.log("Parsed student:", parsedStudent);
-      setStudent(parsedStudent);
+      setLoading(true);
+      setError("");
 
-      const validityDate = getStoredSessionValidity(parsedStudent) || parsedStudent.session_validity_end || "";
-      if (validityDate) {
-        parsedStudent.session_validity_end = validityDate;
+      const storedStudent = localStorage.getItem("studentData");
+
+      if (!storedStudent) {
+        setError("Not logged in. Please log in first.");
+        return;
       }
-      
-      // Initialize edit form with current data
+
+      const loggedInStudent = JSON.parse(storedStudent);
+
+      if (!loggedInStudent?.id) {
+        setError("Invalid student login information.");
+        return;
+      }
+
+      // Always get the latest student information from Supabase
+      const { data: freshStudent, error: studentError } =
+        await supabase
+          .from("students")
+          .select("*")
+          .eq("id", loggedInStudent.id)
+          .single();
+
+      if (studentError) {
+        throw studentError;
+      }
+
+      console.log("Latest student from Supabase:", freshStudent);
+      console.log(
+        "Latest validity date:",
+        freshStudent.session_validity_end
+      );
+
+      setStudent(freshStudent);
+
+      // Replace old cached student data
+      localStorage.setItem(
+        "studentData",
+        JSON.stringify(freshStudent)
+      );
+
       setEditForm({
-        name: parsedStudent.name || "",
-        email: parsedStudent.email || "",
-        phone: parsedStudent.phone || "",
-        course: parsedStudent.course || "",
-        age: parsedStudent.age || "",
-        profile_pic: parsedStudent.profile_pic || ""
+        name: freshStudent.name || "",
+        email: freshStudent.email || "",
+        phone: freshStudent.phone || "",
+        course: freshStudent.course || "",
+        age: freshStudent.age || "",
+        profile_pic: freshStudent.profile_pic || "",
       });
 
-      // Fetch attendance & feedback
-      fetchAttendance(parsedStudent.id);
-      fetchFeedback(parsedStudent.email);
+      await Promise.all([
+        fetchAttendance(freshStudent.id),
+        fetchFeedback(freshStudent.email),
+      ]);
     } catch (err) {
-      console.error("Failed to parse studentData:", err);
-      setError("Invalid login data. Please log in again.");
+      console.error("Failed to load student dashboard:", err);
+
+      setError(
+        err.message || "Failed to load student information."
+      );
+    } finally {
       setLoading(false);
     }
-  }, []);
+  };
+
+  loadStudentDashboard();
+}, []);
+
+useEffect(() => {
+  if (!student?.id) return;
+
+  const channel = supabase
+    .channel(`student-validity-${student.id}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "UPDATE",
+        schema: "public",
+        table: "students",
+        filter: `id=eq.${student.id}`,
+      },
+      (payload) => {
+        const updatedStudent = payload.new;
+
+        console.log(
+          "Student updated in real time:",
+          updatedStudent
+        );
+
+        setStudent(updatedStudent);
+
+        localStorage.setItem(
+          "studentData",
+          JSON.stringify(updatedStudent)
+        );
+      }
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}, [student?.id]);
 
   // Fetch attendance
   const fetchAttendance = async (studentId) => {
