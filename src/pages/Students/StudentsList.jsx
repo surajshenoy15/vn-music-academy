@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { Search, Eye, Users, Mail, Phone, BookOpen, Calendar, Hash, Loader2, AlertCircle, RefreshCw, Plus, Edit, Trash2, Upload, X, User, Check, Camera, ChevronDown, Music } from "lucide-react";
 import { supabase } from "../../supabaseClient";
-import { formatValidityDate, isMissingColumnError, normalizeValidityDate, saveStoredSessionValidity } from "../../utils/sessionValidity";
+import {
+  formatValidityDate,
+  normalizeValidityDate,
+} from "../../utils/sessionValidity";
 
 export default function StudentsList({ onSelectStudent, refreshTrigger }) {
   const [students, setStudents] = useState([]);
@@ -106,48 +109,65 @@ export default function StudentsList({ onSelectStudent, refreshTrigger }) {
     setEditFormData({ ...editFormData, [e.target.name]: e.target.value });
   };
 
-  const handleEditSubmit = async (e) => {
-    e.preventDefault();
-    setIsEditing(true);
-    try {
-      const normalizedValidityDate = normalizeValidityDate(editFormData.session_validity_end);
-      const basePayload = {
-        name: editFormData.name,
-        email: editFormData.email,
-        phone: editFormData.phone,
-        course: editFormData.course,
-        age: editFormData.age ? parseInt(editFormData.age, 10) : null,
-      };
-      const updatePayload = { ...basePayload };
-      if (normalizedValidityDate) {
-        updatePayload.session_validity_end = normalizedValidityDate;
-      }
+const handleEditSubmit = async (e) => {
+  e.preventDefault();
+  setIsEditing(true);
+  setError(null);
 
-      let { error } = await supabase
-        .from('students')
-        .update(updatePayload)
-        .eq('id', editingStudent.id);
+  try {
+    const normalizedValidityDate = normalizeValidityDate(
+      editFormData.session_validity_end
+    );
 
-      if (error && isMissingColumnError(error)) {
-        const fallbackPayload = { ...basePayload };
-        ({ error } = await supabase.from('students').update(fallbackPayload).eq('id', editingStudent.id));
-      }
+    const updatePayload = {
+      name: editFormData.name.trim(),
+      email: editFormData.email.trim(),
+      phone: editFormData.phone?.trim() || null,
+      course: editFormData.course || null,
+      age: editFormData.age
+        ? parseInt(editFormData.age, 10)
+        : null,
 
-      if (error) throw error;
-      saveStoredSessionValidity(editingStudent, normalizedValidityDate);
-      setStudents(students.map(student =>
-        student.id === editingStudent.id
-          ? { ...student, ...editFormData, age: editFormData.age ? parseInt(editFormData.age, 10) : null, session_validity_end: normalizedValidityDate || null }
-          : student
-      ));
-      setEditingStudent(null);
-      setEditFormData({});
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsEditing(false);
+      // Save directly in Supabase
+      session_validity_end: normalizedValidityDate || null,
+    };
+
+    const { data, error } = await supabase
+      .from("students")
+      .update(updatePayload)
+      .eq("id", editingStudent.id)
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
     }
-  };
+
+    setStudents((currentStudents) =>
+      currentStudents.map((student) =>
+        student.id === editingStudent.id
+          ? { ...student, ...data }
+          : student
+      )
+    );
+
+    setEditingStudent(null);
+    setEditFormData({});
+
+    console.log(
+      "✅ Student validity updated:",
+      data.session_validity_end
+    );
+  } catch (err) {
+    console.error("❌ Error updating student:", err);
+
+    setError(
+      err.message || "Failed to update student information"
+    );
+  } finally {
+    setIsEditing(false);
+  }
+};
 
   const handleDeleteClick = (student) => {
     setDeletingStudent(student);
