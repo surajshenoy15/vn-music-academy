@@ -50,22 +50,43 @@ const [editSessionName, setEditSessionName] = useState('');
   // Fetch all attendance records from Supabase
 const fetchAttendance = async () => {
   try {
-    const { data, error } = await supabase
-      .from('attendance')
-      .select(`
-        *,
-        students (
-          id,
-          name,
-          email,
-          phone
-        )
-      `)
-      .order('date', { ascending: false })
-      .range(0, 1999);
+    const PAGE_SIZE = 1000;
+    let allAttendance = [];
+    let from = 0;
 
-    if (error) throw error;
-    setAttendance(data || []);
+    while (true) {
+      const to = from + PAGE_SIZE - 1;
+
+      const { data, error } = await supabase
+        .from('attendance')
+        .select(`
+          *,
+          students (
+            id,
+            name,
+            email,
+            phone
+          )
+        `)
+        .order('date', { ascending: false })
+        .range(from, to);
+
+      if (error) throw error;
+
+      allAttendance = [...allAttendance, ...(data || [])];
+
+      // No more records
+      if (!data || data.length < PAGE_SIZE) {
+        break;
+      }
+
+      from += PAGE_SIZE;
+    }
+
+    console.log("Total attendance fetched:", allAttendance.length);
+
+    setAttendance(allAttendance);
+
   } catch (error) {
     console.error('Error fetching attendance:', error);
   }
